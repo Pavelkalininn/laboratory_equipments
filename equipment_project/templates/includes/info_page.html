@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-8 p-5">
+      <div class="card">
+        <div class="card-header">
+          {{ header }}
+        </div>
+        <div class="card-body">
+          <p>{{ body }}</p>
+          <br>
+          <a href="{% url 'web:index' %}"> Перейти на главную</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

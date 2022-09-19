@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}
+  {% if is_edit %}Редактировать запись{% else %}Добавить запись{% endif %}
+{% endblock %}
+{% block content %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 p-5">
+        <div class="card">
+          <div class="card-header">
+            {% if is_edit %}Редактировать запись{% else %}Добавить запись{% endif %}
+          </div>
+          <div class="card-body">
+            {% load user_filters %}
+              {% if form.errors %}
+                  {% for field in form %}
+                    {% for error in field.errors %}
+                      <div class="alert alert-danger">
+                        {{ error|escape }}
+                      </div>
+                    {% endfor %}
+                  {% endfor %}
+                  {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger">
+                      {{ error|escape }}
+                    </div>
+                  {% endfor %}
+              {% endif %}
+            <form method="post" enctype="multipart/form-data" {% if action_url %}
+              action="{% url action_url %}"
+            {% endif %}>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group row my-3">
+                  <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                      {% if field.field.required %}
+                        <span class="required text-danger">*</span>
+                      {% endif %}
+                  </label>
+                  {{ field|addclass:'form-control' }}
+                    {% if field.help_text %}
+                      <small
+                         id="{{ field.id_for_label }}-help"
+                         class="form-text text-muted"
+                      >
+                        {{ field.help_text|safe }}
+                      </small>
+                    {% endif %}
+                </div>
+              {% endfor %}
+              {% with request.resolver_match.view_name as view_name %}
+                <div class="d-flex justify-content-end">
+                  <button type="submit" name="create_and_exit" class="btn btn-primary" style="margin-right:20px;">
+                    Сохранить и выйти
+                  </button>
+                  {% if view_name  != "web:movement_create" %}
+                    <button type="submit" name="create_and_next" class="btn btn-primary" style="margin-right:20px;">
+                      Сохранить и далее
+                    </button>
+                  {% endif %}
+                </div>
+              {% endwith %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% if value.name %}
+  {{ value.name }}<br>
+{% endif %}
+{% if value.destination.address %}
+  {{ value.destination.address }}<br>
+{% endif %}
+{% if value.renter %}
+  Арендатор: {{ value.renter }}<br>
+{% endif %}
+{% if value.owner %}
+  Владелец: {{ value.owner }}<br>
+{% endif %}
+{% if value.date %}
+  Дата: {{ value.date }}<br>
+{% endif %}
+{% if value.validity_period %}
+  Действует до: {{ value.validity_period }}<br>
+{% endif %}
+{% if value.creator %}
+  {{ value.creator.username }}
+{% endif %}
