@@ -55,7 +55,6 @@ class Equipment(models.Model):
     )
     creator = models.ForeignKey(
         User,
-        null=True,
         related_name='equipments',
         on_delete=models.CASCADE,
         verbose_name='Создатель'
@@ -106,7 +105,6 @@ class Rent(models.Model):
     )
     creator = models.ForeignKey(
         User,
-        null=True,
         related_name='rents',
         on_delete=models.CASCADE,
         verbose_name='Создатель'
@@ -138,7 +136,6 @@ class Attestation(models.Model):
     )
     creator = models.ForeignKey(
         User,
-        null=True,
         related_name='attestations',
         on_delete=models.CASCADE,
         verbose_name='Создатель'
@@ -170,7 +167,6 @@ class Calibration(models.Model):
     )
     creator = models.ForeignKey(
         User,
-        null=True,
         related_name='calibrations',
         on_delete=models.CASCADE,
         verbose_name='Создатель'
@@ -215,7 +211,6 @@ class Movement(models.Model):
     )
     creator = models.ForeignKey(
         User,
-        null=True,
         related_name='movements',
         on_delete=models.CASCADE,
         verbose_name='Создатель'
