@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -351,7 +353,7 @@ class EquipmentPagesTests(TestCase):
 
     def test_comment_post_page(self):
         """Страница equipment_get отображает внесенные связанные данные по
-         оборудованию."""
+         оборудованию (rents, attestations, calibrations)."""
         response = (
             self.authorized_staff_user.get(
                 reverse(
@@ -361,14 +363,18 @@ class EquipmentPagesTests(TestCase):
             )
         )
         self.assertEqual(
-            response.context.get('page_obj')[0].rents,
-            EquipmentPagesTests.equipment.rents,
+            len(response.context.get('page_obj')),
+            1,
         )
         self.assertEqual(
-            response.context.get('page_obj')[0].attestations,
-            EquipmentPagesTests.equipment.attestations,
+            set(response.context.get('page_obj')[0].rents.all()),
+            set(EquipmentPagesTests.equipment.rents.all()),
         )
         self.assertEqual(
-            response.context.get('page_obj')[0].calibrations,
-            EquipmentPagesTests.equipment.calibrations,
+            set(response.context.get('page_obj')[0].attestations.all()),
+            set(EquipmentPagesTests.equipment.attestations.all()),
+        )
+        self.assertEqual(
+            set(response.context.get('page_obj')[0].calibrations.all()),
+            set(EquipmentPagesTests.equipment.calibrations.all()),
         )
