@@ -2,16 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from equipments.models import (
-    Equipment,
-    Organization,
-    Destination,
-    Document,
-    Calibration,
-    Attestation,
-    Movement,
-    Rent
-)
+from equipments.models import (Attestation, Calibration, Destination, Document,
+                               Equipment, Movement, Organization, Rent)
 from web.tests.core import *
 
 User = get_user_model()

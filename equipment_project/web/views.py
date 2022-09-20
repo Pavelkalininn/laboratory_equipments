@@ -1,11 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 
 from core.templatetags.wrappers import is_staff_user
 from equipments.models import Equipment
-from web.forms import (
-    RentForm, EquipmentForm, MovementForm, CalibrationForm, AttestationForm
-)
+from web.forms import (AttestationForm, CalibrationForm, EquipmentForm,
+                       MovementForm, RentForm)
 from web.utils import pagination
 
 

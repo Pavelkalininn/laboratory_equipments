@@ -1,12 +1,9 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 
-from equipments.models import (
-    Equipment,
-    Document,
-)
+from equipments.models import Document, Equipment
 from web.tests.core import *
 
 User = get_user_model()

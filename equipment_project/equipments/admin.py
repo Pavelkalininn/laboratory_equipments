@@ -1,15 +1,7 @@
 from django.contrib import admin
 
-from equipments.models import (
-    Equipment,
-    Document,
-    Destination,
-    Movement,
-    Rent,
-    Attestation,
-    Calibration,
-    Organization
-)
+from equipments.models import (Attestation, Calibration, Destination, Document,
+                               Equipment, Movement, Organization, Rent)
 
 
 class EquipmentAdmin(admin.ModelAdmin):

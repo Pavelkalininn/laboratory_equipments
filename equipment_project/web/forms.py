@@ -1,7 +1,7 @@
 from django import forms
 
-from equipments.models import Rent, Equipment, Attestation, Calibration, \
-    Movement
+from equipments.models import (Attestation, Calibration, Equipment, Movement,
+                               Rent)
 
 
 class RentForm(forms.ModelForm):

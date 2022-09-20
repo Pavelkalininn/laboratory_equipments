@@ -1,15 +1,7 @@
 from rest_framework import serializers
 
-from equipments.models import (
-    Calibration,
-    Movement,
-    Equipment,
-    Rent,
-    Organization,
-    Attestation,
-    Destination,
-    Document
-)
+from equipments.models import (Attestation, Calibration, Destination, Document,
+                               Equipment, Movement, Organization, Rent)
 
 
 class DocumentSerializer(serializers.ModelSerializer):

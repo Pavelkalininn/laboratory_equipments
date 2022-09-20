@@ -3,28 +3,13 @@ from rest_framework import viewsets
 from rest_framework.permissions import SAFE_METHODS
 
 from api.filters import EquipmentFilter
-from api.serializers import (
-    CalibrationSerializer,
-    MovementSerializer,
-    AttestationSerializer,
-    RentSerializer,
-    EquipmentSerializer,
-    OrganizationSerializer,
-    DestinationSerializer,
-    DocumentSerializer,
-    MovementCreateSerializer,
-    EquipmentCreateSerializer
-)
-from equipments.models import (
-    Calibration,
-    Movement,
-    Equipment,
-    Rent,
-    Organization,
-    Attestation,
-    Destination,
-    Document
-)
+from api.serializers import (AttestationSerializer, CalibrationSerializer,
+                             DestinationSerializer, DocumentSerializer,
+                             EquipmentCreateSerializer, EquipmentSerializer,
+                             MovementCreateSerializer, MovementSerializer,
+                             OrganizationSerializer, RentSerializer)
+from equipments.models import (Attestation, Calibration, Destination, Document,
+                               Equipment, Movement, Organization, Rent)
 
 
 class CalibrationViewSet(viewsets.ModelViewSet):
