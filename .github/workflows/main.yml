@@ -52,7 +52,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push_to_docker_hub
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
@@ -80,7 +80,6 @@ jobs:
             echo EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}' >> .env
             echo DEFAULT_FROM_EMAIL='${{ secrets.DEFAULT_FROM_EMAIL }}' >> .env
             sudo docker-compose up -d
-
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
@@ -91,4 +90,3 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: ${{ github.workflow }} успешно выполнен!
-
