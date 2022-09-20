@@ -1,5 +1,4 @@
 from django import forms
-
 from equipments.models import (Attestation, Calibration, Equipment, Movement,
                                Rent)
 

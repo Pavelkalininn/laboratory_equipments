@@ -1,10 +1,7 @@
-from pprint import pprint
-
 from django import forms
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
 from web.tests.core import (ATTESTATION_NAME_FIRST, ATTESTATION_NAME_SECOND,
@@ -276,7 +273,7 @@ class EquipmentPagesTests(TestCase):
             tuple(response.context.get('page_obj'))
         )
 
-    def test_equipment_edit_page_IsInstance_context(self):
+    def test_equipment_edit_page_contains_correct_fields(self):
         """Шаблон equipment_edit сформирован с правильными полями."""
         response = (
             self.authorized_staff_user.get(

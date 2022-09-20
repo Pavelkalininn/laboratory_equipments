@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
 

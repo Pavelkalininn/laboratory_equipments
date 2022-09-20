@@ -6,6 +6,5 @@ def is_staff_user(function):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_staff:
             raise PermissionDenied
-        result = function(request, *args, **kwargs)
-        return result
+        return function(request, *args, **kwargs)
     return wrapper

@@ -1,15 +1,14 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
-from rest_framework.permissions import SAFE_METHODS
-
 from api.filters import EquipmentFilter
 from api.serializers import (AttestationSerializer, CalibrationSerializer,
                              DestinationSerializer, DocumentSerializer,
                              EquipmentCreateSerializer, EquipmentSerializer,
                              MovementCreateSerializer, MovementSerializer,
                              OrganizationSerializer, RentSerializer)
+from django_filters.rest_framework import DjangoFilterBackend
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
+from rest_framework import viewsets
+from rest_framework.permissions import SAFE_METHODS
 
 
 class CalibrationViewSet(viewsets.ModelViewSet):
@@ -84,4 +83,3 @@ class DocumentViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     filterset_fields = ('name', )
-

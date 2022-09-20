@@ -1,87 +1,26 @@
+from core.templatetags.wrappers import is_staff_user
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-
-from core.templatetags.wrappers import is_staff_user
 from equipments.models import Equipment
 from web.forms import (AttestationForm, CalibrationForm, EquipmentForm,
                        MovementForm, RentForm)
-from web.utils import pagination
+from web.utils import pagination, table_filters
 
 
 @login_required(login_url='users:login')
 @is_staff_user
 def index(request):
-    equipments = Equipment.objects.select_related(
-        'creator'
-    ).prefetch_related(
-        'rents',
-        'attestations',
-        'calibrations',
-        'movements'
-    ).all()
-    equipment_id = request.GET.get('equipment_id')
-    inventory = request.GET.get('inventory')
-    name = request.GET.get('name')
-    type = request.GET.get('type')
-    model = request.GET.get('model')
-    documents = request.GET.get('documents')
-    manufacturer = request.GET.get('manufacturer')
-    rent = request.GET.get('rent')
-    attestation = request.GET.get('attestation')
-    calibration = request.GET.get('calibration')
-    movement = request.GET.get('movement')
-
-    if equipment_id:
-        equipments = equipments.filter(id=equipment_id)
-    if inventory:
-        equipments = equipments.filter(inventory__icontains=inventory)
-    if name:
-        equipments = equipments.filter(name__icontains=name)
-    if type:
-        equipments = equipments.filter(type__icontains=type)
-    if model:
-        equipments = equipments.filter(model__icontains=model)
-    if documents:
-        equipments = equipments.filter(documents__name__icontains=documents)
-    if manufacturer:
-        equipments = equipments.filter(manufacturer__icontains=manufacturer)
-
-    if rent:
-        last_rents_ids = []
-        for equip in equipments:
-            if equip.rents.first():
-                last_rents_ids.append(equip.rents.first().id)
-        equipments = equipments.filter(
-            rents__id__in=last_rents_ids,
-            rents__renter__name__icontains=rent
-        )
-    if attestation:
-        last_attestations_ids = []
-        for equip in equipments:
-            if equip.attestations.last():
-                last_attestations_ids.append(equip.attestations.first().id)
-        equipments = equipments.filter(
-            attestations__id__in=last_attestations_ids,
-            attestations__name__icontains=attestation
-        )
-    if calibration:
-        last_calibrations_ids = []
-        for equip in equipments:
-            if equip.calibrations.last():
-                last_calibrations_ids.append(equip.calibrations.first().id)
-        equipments = equipments.filter(
-            calibrations__id__in=last_calibrations_ids,
-            calibrations__name__icontains=calibration
-        )
-    if movement:
-        last_movements_ids = []
-        for equip in equipments:
-            if equip.movements.last():
-                last_movements_ids.append(equip.movements.first().id)
-        equipments = equipments.filter(
-            movement__id__in=last_movements_ids,
-            movements__destination__address__icontains=movement
-        )
+    equipments = table_filters(
+        request,
+        Equipment.objects.select_related(
+            'creator'
+        ).prefetch_related(
+            'rents',
+            'attestations',
+            'calibrations',
+            'movements'
+        ).all()
+    )
     page_obj = pagination(equipments, request)
     context = {
         'page_obj': page_obj,
@@ -124,7 +63,7 @@ def equipment_create(request):
         request,
         'equipments/create_form.html',
         {'form': form}
-        )
+    )
 
 
 @login_required(login_url='users:login')
@@ -166,7 +105,7 @@ def rent_create(request, equipment_id):
         request,
         'equipments/create_form.html',
         {'form': form}
-        )
+    )
 
 
 @login_required(login_url='users:login')
@@ -186,7 +125,7 @@ def attestation_create(request, equipment_id):
         request,
         'equipments/create_form.html',
         {'form': form}
-        )
+    )
 
 
 @login_required(login_url='users:login')
@@ -206,7 +145,7 @@ def calibration_create(request, equipment_id):
         request,
         'equipments/create_form.html',
         {'form': form}
-        )
+    )
 
 
 @login_required(login_url='users:login')
@@ -224,4 +163,4 @@ def movement_create(request, equipment_id):
         request,
         'equipments/create_form.html',
         {'form': form}
-        )
+    )
