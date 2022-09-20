@@ -24,6 +24,7 @@ jobs:
           pip install -r ./equipment_project/requirements.txt
       - name: Test with flake8 and unittests
         run: |
+          ls
           python manage.py test
 
   build_and_push_to_docker_hub:
