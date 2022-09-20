@@ -45,40 +45,41 @@ def index(request):
         equipments = equipments.filter(documents__name__icontains=documents)
     if manufacturer:
         equipments = equipments.filter(manufacturer__icontains=manufacturer)
+
     if rent:
         last_rents_ids = []
         for equip in equipments:
             if equip.rents.first():
-                last_rents_ids.append(equip.rents.all()[0].id)
+                last_rents_ids.append(equip.rents.first().id)
         equipments = equipments.filter(
-            id__in=last_rents_ids,
+            rents__id__in=last_rents_ids,
             rents__renter__name__icontains=rent
         )
     if attestation:
         last_attestations_ids = []
         for equip in equipments:
             if equip.attestations.last():
-                last_attestations_ids.append(equip.attestations.last().id)
+                last_attestations_ids.append(equip.attestations.first().id)
         equipments = equipments.filter(
-            id__in=last_attestations_ids,
+            attestations__id__in=last_attestations_ids,
             attestations__name__icontains=attestation
         )
     if calibration:
         last_calibrations_ids = []
         for equip in equipments:
             if equip.calibrations.last():
-                last_calibrations_ids.append(equip.calibrations.last().id)
+                last_calibrations_ids.append(equip.calibrations.first().id)
         equipments = equipments.filter(
-            id__in=last_calibrations_ids,
+            calibrations__id__in=last_calibrations_ids,
             calibrations__name__icontains=calibration
         )
     if movement:
         last_movements_ids = []
         for equip in equipments:
             if equip.movements.last():
-                last_movements_ids.append(equip.movements.last().id)
+                last_movements_ids.append(equip.movements.first().id)
         equipments = equipments.filter(
-            id__in=last_movements_ids,
+            movement__id__in=last_movements_ids,
             movements__destination__address__icontains=movement
         )
     page_obj = pagination(equipments, request)
