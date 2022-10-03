@@ -20,7 +20,8 @@ from web.tests.core import (ATTESTATION_NAME_FIRST, ATTESTATION_NAME_SECOND,
                             MASS_EQUIPMENT_NAME,
                             MASS_EQUIPMENT_NOMENCLATURE_KEY,
                             MASS_EQUIPMENT_SERIAL_NUMBER,
-                            NOMENCLATURE_KEY_FIRST, USER_NAME_STAFF)
+                            NOMENCLATURE_KEY_FIRST, SECOND_ORGANIZATION_NAME,
+                            USER_NAME_STAFF)
 from web.utils import COUNT_OF_EQUIPMENT
 
 User = get_user_model()
