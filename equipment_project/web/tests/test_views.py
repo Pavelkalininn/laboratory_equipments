@@ -12,13 +12,15 @@ from web.tests.core import (ATTESTATION_NAME_FIRST, ATTESTATION_NAME_SECOND,
                             DESTINATION_ADDRESS_SECOND,
                             DOCUMENT_DESCRIPTION_NAME, DOCUMENT_MANUAL_NAME,
                             DOCUMENT_PATH_FIRST, EQUIPMENT_MODEL_FIRST,
-                            EQUIPMENT_NAME_FIRST, EQUIPMENT_TYPE_FIRST,
+                            EQUIPMENT_NAME_FIRST,
+                            EQUIPMENT_SERIAL_NUMBER_FIRST,
                             FIRST_ORGANIZATION_NAME, INVENTORY_NUM_FIRST,
                             MANUFACTURER_FIRST, MASS_EQUIPMENT_DOCUMENT_PATH,
                             MASS_EQUIPMENT_MANUFACTURER, MASS_EQUIPMENT_MODEL,
                             MASS_EQUIPMENT_NAME,
                             MASS_EQUIPMENT_NOMENCLATURE_KEY,
-                            MASS_EQUIPMENT_TYPE, NOMENCLATURE_KEY_FIRST,
+                            MASS_EQUIPMENT_SERIAL_NUMBER,
+                            NOMENCLATURE_KEY_FIRST,
                             SECOND_ORGANIZATION_NAME, USER_NAME_STAFF)
 from web.utils import COUNT_OF_EQUIPMENT
 
@@ -55,7 +57,7 @@ class EquipmentPagesTests(TestCase):
             Equipment(
                 inventory=count,
                 name=MASS_EQUIPMENT_NAME + str(count),
-                type=MASS_EQUIPMENT_TYPE,
+                serial_number=MASS_EQUIPMENT_SERIAL_NUMBER,
                 model=MASS_EQUIPMENT_MODEL,
                 manufacturer=MASS_EQUIPMENT_MANUFACTURER,
                 nomenclature_key=MASS_EQUIPMENT_NOMENCLATURE_KEY,
@@ -68,7 +70,7 @@ class EquipmentPagesTests(TestCase):
         cls.equipment = Equipment.objects.create(
             inventory=INVENTORY_NUM_FIRST,
             name=EQUIPMENT_NAME_FIRST,
-            type=EQUIPMENT_TYPE_FIRST,
+            serial_number=EQUIPMENT_SERIAL_NUMBER_FIRST,
             model=EQUIPMENT_MODEL_FIRST,
             manufacturer=MANUFACTURER_FIRST,
             nomenclature_key=NOMENCLATURE_KEY_FIRST,
@@ -286,7 +288,7 @@ class EquipmentPagesTests(TestCase):
         fields_dict = {
             'inventory': forms.fields.CharField,
             'name': forms.fields.CharField,
-            'type': forms.fields.CharField,
+            'serial_number': forms.fields.CharField,
             'model': forms.fields.CharField,
             'manufacturer': forms.fields.CharField,
             'nomenclature_key': forms.fields.IntegerField,

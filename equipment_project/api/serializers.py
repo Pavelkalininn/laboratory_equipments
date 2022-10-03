@@ -86,7 +86,7 @@ class EquipmentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'inventory', 'name', 'type', 'model', 'manufacturer',
+            'inventory', 'name', 'serial_number', 'model', 'manufacturer',
             'nomenclature_key', 'documents', 'document_path',
             'rents', 'attestations', 'calibrations', 'movements'
         )

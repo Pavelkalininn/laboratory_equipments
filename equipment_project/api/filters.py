@@ -15,11 +15,11 @@ class EquipmentFilter(django_filters.FilterSet):
         lookup_expr='icontains',
         field_name='model'
     )
-    type = django_filters.CharFilter(
+    serial_number = django_filters.CharFilter(
         lookup_expr='icontains',
-        field_name='type'
+        field_name='serial_number'
     )
 
     class Meta:
         model = Equipment
-        fields = ('name', 'inventory', 'model', 'type')
+        fields = ('name', 'inventory', 'model', 'serial_number')

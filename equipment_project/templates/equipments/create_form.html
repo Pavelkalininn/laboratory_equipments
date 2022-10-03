@@ -8,7 +8,14 @@
       <div class="col-md-8 p-5">
         <div class="card">
           <div class="card-header">
-            {% if is_edit %}Редактировать запись{% else %}Добавить запись{% endif %}
+
+            {% if is_edit %}Редактировать {% else %}Добавить {% endif %}
+            {% if view_name  == 'web:rent_create' %}арендатора{% endif %}
+            {% if view_name  == 'web:equipment_create' %}оборудование{% endif %}
+            {% if view_name  == 'web:equipment_edit' %}оборудование{% endif %}
+            {% if view_name  == 'web:attestation_create' %}аттестацию{% endif %}
+            {% if view_name  == 'web:calibration_create' %}калибровку{% endif %}
+            {% if view_name  == 'web:movement_create' %}местоположение{% endif %}
           </div>
           <div class="card-body">
             {% load user_filters %}

@@ -17,7 +17,7 @@ class EquipmentForm(forms.ModelForm):
         fields = (
             'inventory',
             'name',
-            'type',
+            'serial_number',
             'model',
             'manufacturer',
             'nomenclature_key',

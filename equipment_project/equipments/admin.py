@@ -8,7 +8,7 @@ class EquipmentAdmin(admin.ModelAdmin):
         'id',
         'inventory',
         'name',
-        'type',
+        'serial_number',
         'model',
         'manufacturer',
         'nomenclature_key',

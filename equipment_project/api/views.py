@@ -53,7 +53,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     filterset_class = EquipmentFilter
-    filterset_fields = ('name', 'inventory', 'model', 'type')
+    filterset_fields = ('name', 'inventory', 'model', 'serial_number')
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:

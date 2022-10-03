@@ -5,7 +5,7 @@ SIMPLE_FILTERED_FIELDS = {
     'equipment_id': 'id',
     'inventory': 'inventory__icontains',
     'name': 'name__icontains',
-    'type': 'type__icontains',
+    'serial_number': 'serial_number__icontains',
     'model': 'model__icontains',
     'documents': 'documents__name__icontains',
     'manufacturer': 'manufacturer__icontains'

@@ -5,7 +5,7 @@ from django.test import Client, TestCase
 from equipments.models import Document, Equipment
 from web.tests.core import (DOCUMENT_MANUAL_NAME, DOCUMENT_PATH_FIRST,
                             EQUIPMENT_MODEL_FIRST, EQUIPMENT_NAME_FIRST,
-                            EQUIPMENT_TYPE_FIRST, INVENTORY_NUM_FIRST,
+                            EQUIPMENT_SERIAL_NUMBER_FIRST, INVENTORY_NUM_FIRST,
                             MANUFACTURER_FIRST, NOMENCLATURE_KEY_FIRST,
                             USER_NAME_NON_STAFF, USER_NAME_STAFF)
 
@@ -30,7 +30,7 @@ class EquipmentURLTests(TestCase):
         cls.equipment = Equipment.objects.create(
             inventory=INVENTORY_NUM_FIRST,
             name=EQUIPMENT_NAME_FIRST,
-            type=EQUIPMENT_TYPE_FIRST,
+            serial_number=EQUIPMENT_SERIAL_NUMBER_FIRST,
             model=EQUIPMENT_MODEL_FIRST,
             manufacturer=MANUFACTURER_FIRST,
             nomenclature_key=NOMENCLATURE_KEY_FIRST,
