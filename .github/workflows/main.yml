@@ -24,7 +24,7 @@ jobs:
           pip install -r ./equipment_project/requirements.txt
       - name: Test with flake8 and unittests
         run: |
-          python -m flake8 && cd infra/ sudo docker-compose exec web python manage.py test
+          python -m flake8 && cd infra/ && sudo docker-compose exec web python manage.py test
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
