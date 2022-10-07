@@ -66,7 +66,7 @@ class EquipmentPagesTests(TestCase):
             ) for count in range(COUNT_OF_EQUIPMENT)
         ]
         Equipment.objects.bulk_create(EquipmentPagesTests.mass_equipments)
-        cls.last_mass_equipment = Equipment.objects.get(id=COUNT_OF_EQUIPMENT)
+        cls.first_mass_equipment = Equipment.objects.all().first()
         cls.equipment = Equipment.objects.create(
             inventory=INVENTORY_NUM_FIRST,
             name=EQUIPMENT_NAME_FIRST,
@@ -238,10 +238,9 @@ class EquipmentPagesTests(TestCase):
          сортировкой."""
         response = self.authorized_staff_user.get(reverse('web:index'))
         first_object, second_object, *_ = response.context.get('page_obj')
-
         post_dict = {
             first_object: EquipmentPagesTests.equipment,
-            second_object: EquipmentPagesTests.last_mass_equipment
+            second_object: EquipmentPagesTests.first_mass_equipment
         }
         for equipment_obj, expected_value in post_dict.items():
             with self.subTest(equipment_obj=equipment_obj):

@@ -25,9 +25,9 @@ jobs:
       - name: Test with flake8 and unittests
         run: |
           python -m flake8
-#          cd equipment_project/
-#          python manage.py migrate
-#          python manage.py test
+          ls
+          cd infra/
+          sudo docker-compose exec web python manage.py test
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
@@ -50,7 +50,7 @@ jobs:
         with:
           push: true
           context: equipment_project/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v0.5
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v0.6
 
 #  deploy:
 #    runs-on: ubuntu-latest

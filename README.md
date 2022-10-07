@@ -41,6 +41,9 @@ Django - web приложение для оперативного изменен
 
      docker-compose down -v
 
+Для запуска тестов unittest в папке infra необходимо выполнить:
+
+    sudo docker-compose exec web python manage.py test
 
 
 Автор: [__Паша Калинин__](https://github.com/Pavelkalininn)
