@@ -30,7 +30,7 @@ class Equipment(models.Model):
     )
     serial_number = models.CharField(
         max_length=256,
-        verbose_name='Заводской/Серийный номер'
+        verbose_name='Серийный номер'
     )
     model = models.CharField(
         max_length=256,

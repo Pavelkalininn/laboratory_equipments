@@ -1,6 +1,6 @@
 # БД с перечнем испытательного оборудования лаборатории с документацией на него
 
-![Workflow](https://github.com/Pavelkalininn/foodgram-project-react/actions/workflows/main.yml/badge.svg)
+![Workflow](https://github.com/Pavelkalininn/laboratory_equipments/actions/workflows/main.yml/badge.svg)
 
 
 ## Описание
