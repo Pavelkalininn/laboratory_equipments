@@ -25,7 +25,6 @@ jobs:
       - name: Test with flake8 and unittests
         run: |
           python -m flake8
-          ls
           cd infra/
           sudo docker-compose exec web python manage.py test
 
