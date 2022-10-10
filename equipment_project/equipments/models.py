@@ -27,6 +27,7 @@ class User(AbstractUser):
     )
     telegram_id = models.PositiveIntegerField(
         null=True,
+        blank=True,
         unique=True,
         verbose_name='Телеграм id'
     )

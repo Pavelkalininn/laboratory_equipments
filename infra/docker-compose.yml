@@ -13,7 +13,7 @@ services:
     build:
       context: ../equipment_project
       dockerfile: Dockerfile
-#    image: ${DOCKER_USERNAME}/equipment_project:v0.8
+#    image: ${DOCKER_USERNAME}/equipment_project:v0.9
     restart: always
     volumes:
       - static_value:/app/static/
