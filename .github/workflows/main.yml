@@ -24,8 +24,9 @@ jobs:
           pip install -r ./equipment_project/requirements.txt
       - name: Test with flake8 and unittests
         run: |
-          sudo docker-compose -f ./infra/docker-compose_tests.yml up -d --build
-          sudo docker-compose -f ./infra/docker-compose_tests.yml exec -T web python manage.py test
+          python -m flake8
+#          sudo docker-compose -f ./infra/docker-compose_tests.yml up -d --build
+#          sudo docker-compose -f ./infra/docker-compose_tests.yml exec -T web python manage.py test
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
@@ -48,7 +49,7 @@ jobs:
         with:
           push: true
           context: equipment_project/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v0.6
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v0.7
 
 #  deploy:
 #    runs-on: ubuntu-latest

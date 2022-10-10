@@ -10,7 +10,7 @@ services:
       - ./.env
 
   web:
-    image: guguruge/equipment_project:v0.5
+    image: guguruge/equipment_project:v0.7
     restart: always
     volumes:
       - static_value:/app/static/
