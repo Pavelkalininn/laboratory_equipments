@@ -24,6 +24,7 @@ jobs:
           pip install -r ./equipment_project/requirements.txt
       - name: Test with flake8 and unittests
         run: |
+          sudo docker-compose -f ./infra/docker-compose.yml up -d --build
           sudo docker-compose -f ./infra/docker-compose.yml exec web python manage.py test
 
   build_and_push_to_docker_hub:
