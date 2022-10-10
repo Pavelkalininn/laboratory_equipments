@@ -30,7 +30,7 @@ Django - web приложение для оперативного изменен
 
 ### Для запуска проекта, применения миграций, создания суперюзера, загрузки статики соответственно необходимо в папке infra выполнить команды:
     
-    docker-compose up -d --build
+    sudo docker-compose up -d --build
     sudo docker-compose exec web python manage.py migrate
     sudo docker-compose exec web python manage.py createsuperuser
     sudo docker-compose exec web python manage.py collectstatic --no-input
@@ -41,9 +41,10 @@ Django - web приложение для оперативного изменен
 
      docker-compose down -v
 
-Для запуска тестов unittest в папке infra необходимо выполнить:
+Для запуска тестов unittest в корневой папке необходимо выполнить:
 
-    sudo docker-compose exec web python manage.py test
+    sudo docker-compose -f ./infra/docker-compose_tests.yml up -d --build
+    sudo docker-compose -f ./infra/docker-compose_tests.yml exec -T web python manage.py test
 
 
 Автор: [__Паша Калинин__](https://github.com/Pavelkalininn)

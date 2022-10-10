@@ -1,7 +1,40 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 
-User = get_user_model()
+
+class User(AbstractUser):
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ('email', 'first_name', 'last_name', 'telegram_id')
+    username = models.CharField(
+        unique=True,
+        max_length=150,
+        verbose_name='Логин',
+        validators=(RegexValidator(regex=r'^[\w.@+-]+\Z'), )
+    )
+    first_name = models.CharField(
+        max_length=150,
+        verbose_name='Имя'
+    )
+    last_name = models.CharField(
+        max_length=150,
+        verbose_name='Фамилия'
+    )
+    email = models.EmailField(
+        unique=True,
+        max_length=254,
+        verbose_name='Почта'
+    )
+    telegram_id = models.PositiveIntegerField(
+        null=True,
+        unique=True,
+        verbose_name='Телеграм id'
+    )
+
+    class Meta:
+        ordering = ('-id',)
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
 
 class Document(models.Model):
@@ -40,7 +73,7 @@ class Equipment(models.Model):
         max_length=256,
         verbose_name='Производитель'
     )
-    nomenclature_key = models.PositiveIntegerField(
+    nomenclature_key = models.PositiveBigIntegerField(
         verbose_name='Код ТН ВЭД'
     )
     documents = models.ManyToManyField(

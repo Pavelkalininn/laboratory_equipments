@@ -1,26 +1,26 @@
 version: '3.3'
 services:
 
-  db:
+  db_test:
     image: postgres:13.0-alpine
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data_test:/var/lib/postgresql/data/
     env_file:
       - ./example.env
 
-  web:
-    image: guguruge/equipment_project:v0.7
+  web_test:
+    image: guguruge/equipment_project:v0.8
     restart: always
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
     depends_on:
-      - db
+      - db_test
     env_file:
       - ./example.env
 
-  nginx:
+  nginx_test:
     image: nginx:1.19.3
     restart: always
     ports:
@@ -30,9 +30,9 @@ services:
       - static_value:/static/
       - media_value:/media/
     depends_on:
-      - web
+      - web_test
 
 volumes:
   static_value:
   media_value:
-  postgres_data:
+  postgres_data_test:
