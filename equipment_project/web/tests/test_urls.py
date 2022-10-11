@@ -18,10 +18,16 @@ class EquipmentURLTests(TestCase):
         super().setUpClass()
         cls.staff_user = User.objects.create_user(
             username=USER_NAME_STAFF,
+            email='first@mail.ru',
+            first_name='staff_name',
+            last_name='staff_last_name',
             is_staff=True
         )
         cls.non_staff_user = User.objects.create_user(
             username=USER_NAME_NON_STAFF,
+            email='last@mail.ru',
+            first_name='non_staff_name',
+            last_name='non_staff_last_name',
             is_staff=False
         )
         cls.document_manual = Document.objects.create(
