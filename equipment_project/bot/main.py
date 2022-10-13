@@ -7,7 +7,7 @@ from json import JSONDecodeError
 
 import requests
 from dotenv import load_dotenv
-from exceptions import BotException
+from exceptions import BotError
 from requests import RequestException
 from telebot import ExceptionHandler, types
 from telebot.async_telebot import AsyncTeleBot
@@ -110,7 +110,7 @@ def get_api_answer(sender_id, message, method, endpoint):
             timeout=30
         )
         if api_answer.status_code != HTTPStatus.OK:
-            return f'{api_answer} -- {api_answer.status_code} -- {api_answer.text}'
+            return f'{api_answer} -- {api_answer.status_code} --'
         return api_answer.json()
     except RequestException as error:
         logging.error(error, exc_info=True)
@@ -129,7 +129,7 @@ def main():
 
     if not check_tokens():
         logging.critical('Отсутствуют переменные окружения.')
-        raise BotException('Программа принудительно остановлена.'
+        raise BotError('Программа принудительно остановлена.'
                            ' Отсутствуют переменные окружения.')
 
     @bot.message_handler(commands=['start'])

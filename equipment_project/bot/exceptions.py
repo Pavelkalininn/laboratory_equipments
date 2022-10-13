@@ -1,7 +1,7 @@
 import logging
 
 
-class BotException(Exception):
+class BotError(Exception):
 
     def __init__(self, message):
         logging.error(message)

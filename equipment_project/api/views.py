@@ -1,5 +1,3 @@
-from rest_framework.generics import get_object_or_404
-
 from api.filters import EquipmentFilter
 from api.permissions import IsStaff
 from api.serializers import (AttestationSerializer, CalibrationSerializer,
@@ -8,10 +6,10 @@ from api.serializers import (AttestationSerializer, CalibrationSerializer,
                              MovementCreateSerializer, MovementSerializer,
                              OrganizationSerializer, RentSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
-
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent, User)
 from rest_framework import viewsets
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import SAFE_METHODS
 
 
