@@ -10,10 +10,7 @@ services:
       - ./.env
 
   web:
-#    build:
-#      context: ../equipment_project
-#      dockerfile: Dockerfile
-    image: ${DOCKER_USERNAME}/equipment_project:v0.9
+    image: ${DOCKER_USERNAME}/equipment_project:v1.0
     restart: always
     volumes:
       - static_value:/app/static/
@@ -32,6 +29,15 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - static_value:/static/
       - media_value:/media/
+    depends_on:
+      - web
+
+  bot:
+    build:
+      context: ../equipment_project/bot/
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
     depends_on:
       - web
 

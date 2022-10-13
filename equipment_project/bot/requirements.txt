@@ -1,0 +1,4 @@
+aiohttp
+pyTelegramBotAPI
+python-dotenv
+fastapi

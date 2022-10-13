@@ -4,24 +4,48 @@ from rest_framework import serializers
 
 
 class DocumentSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         fields = '__all__'
         model = Document
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         fields = '__all__'
         model = Organization
 
 
 class CalibrationSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         fields = '__all__'
         model = Calibration
 
 
 class DestinationSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         fields = '__all__'
         model = Destination
@@ -29,6 +53,11 @@ class DestinationSerializer(serializers.ModelSerializer):
 
 class MovementSerializer(serializers.ModelSerializer):
     destination = DestinationSerializer()
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
 
     class Meta:
         fields = '__all__'
@@ -39,6 +68,11 @@ class MovementCreateSerializer(serializers.ModelSerializer):
     destination = serializers.PrimaryKeyRelatedField(
         queryset=Destination.objects.all()
     )
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
 
     class Meta:
         fields = '__all__'
@@ -46,12 +80,24 @@ class MovementCreateSerializer(serializers.ModelSerializer):
 
 
 class RentSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         fields = '__all__'
         model = Rent
 
 
 class AttestationSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         fields = '__all__'
         model = Attestation
@@ -83,12 +129,18 @@ class EquipmentCreateSerializer(serializers.ModelSerializer):
         many=True,
         required=False
     )
+    creator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
 
     class Meta:
         fields = (
+            'id',
             'inventory', 'name', 'serial_number', 'model', 'manufacturer',
             'nomenclature_key', 'documents', 'document_path',
-            'rents', 'attestations', 'calibrations', 'movements'
+            'rents', 'attestations', 'calibrations', 'movements', 'creator'
         )
         model = Equipment
 

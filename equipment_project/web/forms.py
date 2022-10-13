@@ -1,6 +1,6 @@
 from django import forms
 from equipments.models import (Attestation, Calibration, Equipment, Movement,
-                               Rent)
+                               Rent, Document)
 
 
 class RentForm(forms.ModelForm):
@@ -45,3 +45,10 @@ class MovementForm(forms.ModelForm):
     class Meta:
         model = Movement
         fields = ('destination', 'date')
+
+
+class DocumentForm(forms.ModelForm):
+
+    class Meta:
+        model = Document
+        fields = ('name', )
