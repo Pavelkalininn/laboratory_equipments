@@ -39,8 +39,8 @@ jobs:
           python -m flake8
 
       - name: Test with unittests
-          run: |
-            cd equipment_project/ && python manage.py test
+        run: |
+          cd equipment_project/ && python manage.py test
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
