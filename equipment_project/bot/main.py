@@ -129,8 +129,10 @@ def main():
 
     if not check_tokens():
         logging.critical('Отсутствуют переменные окружения.')
-        raise BotError('Программа принудительно остановлена.'
-                           ' Отсутствуют переменные окружения.')
+        raise BotError(
+            'Программа принудительно остановлена.'
+            ' Отсутствуют переменные окружения.'
+        )
 
     @bot.message_handler(commands=['start'])
     async def start(message: Message):
