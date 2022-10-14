@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+
 from api.filters import EquipmentFilter
 from api.permissions import IsStaff
 from api.serializers import (AttestationSerializer, CalibrationSerializer,
@@ -7,10 +9,12 @@ from api.serializers import (AttestationSerializer, CalibrationSerializer,
                              OrganizationSerializer, RentSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
 from equipments.models import (Attestation, Calibration, Destination, Document,
-                               Equipment, Movement, Organization, Rent, User)
+                               Equipment, Movement, Organization, Rent)
 from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import SAFE_METHODS
+
+User = get_user_model()
 
 
 class CalibrationViewSet(viewsets.ModelViewSet):

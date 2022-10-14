@@ -4,6 +4,7 @@ import os
 import sys
 from http import HTTPStatus
 from json import JSONDecodeError
+from typing import Union
 
 import requests
 from dotenv import load_dotenv
@@ -41,7 +42,26 @@ INCORRECT_COMMAND = (
 FIRST, SECOND, THIRD, FOURTH = range(4)
 INFO = 'Бот для просмотра и внесения сведений по оборудованию'
 BUTTON_START = ['/start']
+ANY_THINK_WAS_WRONG = (
+    'Что-то пошло не так, если ошибка повторится - обратитесь к администратору'
+)
 user_status = {}
+EQUIPMENT_CONST = (
+    'id: {id}; /n'
+    'Инвентарный номер: {inventory}; /n'
+    'Наименование: {name}; /n'
+    'Серийный номер: {serial_number}; /n'
+    'Модель: {model}; /n'
+    'Изготовитель: {manufacturer}; /n'
+    'Код ТН ВЭД: {nomenclature_key}; /n'
+    'Документы: {documents}; /n'
+    'Путь к папке с документами: {document_path}; /n'
+    'Последнее изменение пользователем: {telegram_id}; /n'
+    'В аренде: {rents}; /n'
+    'Аттестаты: {attestations}; /n'
+    'Калибровки: {calibrations}; /n'
+    'Местоположения: {movements}; /n'
+)
 TRAINEE = {
     "inventory": 16,
     "name": "Name",
@@ -73,6 +93,37 @@ def check_tokens():
     """Проверка наличия переменных окружения."""
     return TELEGRAM_TOKEN and WEB_HOST
 
+def equipment_parser(data: Union[str, list]) -> str:
+    if isinstance(data, str):
+        return data
+    result = ''
+    for equipment in data:
+        result += EQUIPMENT_CONST.format(**equipment)
+    return result
+
+
+def get_api_answer(
+        sender_id: int,
+        message: str,
+        method: str,
+        endpoint: str
+) -> Union[list, str]:
+    """Возвращает ответ от API."""
+    try:
+        api_answer = getattr(requests, method)(
+            f'http://{WEB_HOST}:8000/api/v1/{endpoint}/?{message}',
+            data=TRAINEE,
+            timeout=30
+        )
+        if api_answer.status_code != HTTPStatus.OK:
+            logging.error('Некорректный статус от API', exc_info=True)
+            return ANY_THINK_WAS_WRONG + str(api_answer.status_code)
+        return api_answer.json()
+    except RequestException as error:
+        logging.error(error, exc_info=True)
+    except JSONDecodeError as error:
+        logging.error(error, exc_info=True)
+
 
 async def text_parser(bot, chat_id, text):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -94,28 +145,15 @@ async def text_parser(bot, chat_id, text):
             )
     else:
         if user_status.get(chat_id) == FIRST:
+            keyboard.add(*VARIANTS.keys())
             await bot.send_message(
                 chat_id,
-                get_api_answer(chat_id, text, 'get', 'equipments'),
+                equipment_parser(
+                    get_api_answer(chat_id, text, 'get', 'equipments')
+                ),
                 reply_markup=keyboard
             )
-
-
-def get_api_answer(sender_id, message, method, endpoint):
-    """Возвращает ответ от API."""
-    try:
-        api_answer = getattr(requests, method)(
-            f'http://{WEB_HOST}:8000/api/v1/{endpoint}/',
-            data=TRAINEE,
-            timeout=30
-        )
-        if api_answer.status_code != HTTPStatus.OK:
-            return f'{api_answer} -- {api_answer.status_code} --'
-        return api_answer.json()
-    except RequestException as error:
-        logging.error(error, exc_info=True)
-    except JSONDecodeError as error:
-        logging.error(error, exc_info=True)
+            user_status.pop(chat_id)
 
 
 def main():

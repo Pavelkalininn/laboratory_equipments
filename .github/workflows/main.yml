@@ -63,7 +63,7 @@ jobs:
         with:
           push: true
           context: equipment_project/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.0
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.1
 
 #  deploy:
 #    runs-on: ubuntu-latest

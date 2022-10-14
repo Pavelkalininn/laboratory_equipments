@@ -10,7 +10,7 @@ services:
       - ./.env
 
   web:
-    image: ${DOCKER_USERNAME}/equipment_project:v1.0
+    image: ${DOCKER_USERNAME}/equipment_project:v1.1
     restart: always
     volumes:
       - static_value:/app/static/
