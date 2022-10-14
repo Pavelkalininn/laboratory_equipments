@@ -93,6 +93,7 @@ def check_tokens():
     """Проверка наличия переменных окружения."""
     return TELEGRAM_TOKEN and WEB_HOST
 
+
 def equipment_parser(data: Union[str, list]) -> str:
     if isinstance(data, str):
         return data

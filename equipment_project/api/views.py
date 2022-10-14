@@ -1,5 +1,3 @@
-from django.contrib.auth import get_user_model
-
 from api.filters import EquipmentFilter
 from api.permissions import IsStaff
 from api.serializers import (AttestationSerializer, CalibrationSerializer,
@@ -7,6 +5,7 @@ from api.serializers import (AttestationSerializer, CalibrationSerializer,
                              EquipmentCreateSerializer, EquipmentSerializer,
                              MovementCreateSerializer, MovementSerializer,
                              OrganizationSerializer, RentSerializer)
+from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
