@@ -1,13 +1,13 @@
-# БД с перечнем испытательного оборудования лаборатории с документацией на него
+# Laboratory equipment database with parameters and documentation on Django web UI and Telegram bot UI (in progress).
 
 ![Workflow](https://github.com/Pavelkalininn/laboratory_equipments/actions/workflows/main.yml/badge.svg)
 
 
-## Описание
+## Description
 
-Django - web приложение для оперативного изменения информации по оборудованию ИЛ
+Django - web application for operational laboratory equipment information changes.
 
-## Технологии
+## Technology
 
     Django==3.2.15
     django-filter==22.1
@@ -21,30 +21,29 @@ Django - web приложение для оперативного изменен
     gunicorn==20.1.0
     psycopg2-binary==2.9.3
 
-## Шаблон наполнения env-файла лежит по адресу: 
+## Env file template path: 
 
 [infra/example.env](./infra/example.env)
-Для запуска CI необходимо наличие переменной DOCKER_USERNAME в окружении Github secrets
 
-## Запуск проекта:
+The DOCKER_USERNAME variable must be present in the Github secrets environment to run CI
 
-### Для запуска проекта, применения миграций, создания суперюзера, загрузки статики соответственно необходимо в папке infra выполнить команды:
+## Project run:
+
+### It is necessary to execute the commands in the infra folder to launch a project, apply migrations, create a superuser, load static, respectively:
     
     sudo docker-compose up -d --build
     sudo docker-compose exec web python manage.py migrate
     sudo docker-compose exec web python manage.py createsuperuser
     sudo docker-compose exec web python manage.py collectstatic --no-input
 
-Для работы в приложении необходимо зарегистрироваться на главной странице, после чего подтвердить статус пользователя как staff в админ-панели
+You need to register on the main page, and then confirm the user's status as staff in the admin panel to work in the web application
 
-для остановки контейнера необходимо в папке infra выполнить:
+Run in the infra folder to stop the container:
 
      docker-compose down -v
 
-Для запуска тестов unittest в корневой папке необходимо выполнить:
+To run unittest in the folder with the manage.py must be executed:
 
-    sudo docker-compose -f ./infra/docker-compose_tests.yml up -d --build
-    sudo docker-compose -f ./infra/docker-compose_tests.yml exec -T web python manage.py test
+    python manage.py test
 
-
-Автор: [__Паша Калинин__](https://github.com/Pavelkalininn)
+Author: [__Pavel Kalinin__](https://github.com/Pavelkalininn)
