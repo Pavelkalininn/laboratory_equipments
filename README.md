@@ -46,4 +46,5 @@ To run unittest in the folder with the manage.py must be executed:
 
     python manage.py test
 
+
 Author: [__Pavel Kalinin__](https://github.com/Pavelkalininn)
