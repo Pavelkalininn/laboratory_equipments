@@ -146,8 +146,8 @@ class EquipmentCreateSerializer(serializers.ModelSerializer):
 
 
 class EquipmentSerializer(EquipmentCreateSerializer):
-    rents = RentSerializer(many=True)
-    attestations = AttestationSerializer(many=True)
-    calibrations = CalibrationSerializer(many=True)
-    movements = MovementSerializer(many=True)
-    documents = DocumentSerializer(many=True)
+    rents = serializers.StringRelatedField(many=True)
+    attestations = serializers.StringRelatedField(many=True)
+    calibrations = serializers.StringRelatedField(many=True)
+    movements = serializers.StringRelatedField(many=True)
+    documents = serializers.StringRelatedField(many=True)

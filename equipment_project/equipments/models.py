@@ -111,7 +111,7 @@ class Organization(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['name']
 
 
 class Rent(models.Model):
@@ -144,7 +144,7 @@ class Rent(models.Model):
     )
 
     def __str__(self):
-        return f'Арендодатель: {self.owner}, арендатор: {self.renter}.'
+        return f'В аренде у {self.renter} с {self.date}, владелец {self.owner}'
 
     class Meta:
         ordering = ['-date', '-id']
@@ -175,10 +175,12 @@ class Attestation(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return (
+            f'{self.name} от {self.date}, действует до {self.validity_period}'
+        )
 
     class Meta:
-        ordering = ['-validity_period']
+        ordering = ['-date', '-id']
 
 
 class Calibration(models.Model):
@@ -206,10 +208,12 @@ class Calibration(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return (
+            f'{self.name} от {self.date}, действует до {self.validity_period}'
+        )
 
     class Meta:
-        ordering = ['-validity_period']
+        ordering = ['-date', '-id']
 
 
 class Destination(models.Model):
@@ -250,7 +254,7 @@ class Movement(models.Model):
     )
 
     def __str__(self):
-        return f'По адресу {self.destination} расположен {self.equipment}'
+        return f'По адресу {self.destination} с {self.date}'
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['-date', '-id']

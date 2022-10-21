@@ -30,10 +30,11 @@ Django - web приложение для оперативного изменен
 
 ### Для запуска проекта, применения миграций, создания суперюзера, загрузки статики соответственно необходимо в папке infra выполнить команды:
     
-    sudo docker-compose up -d --build
-    sudo docker-compose exec web python manage.py migrate
-    sudo docker-compose exec web python manage.py createsuperuser
-    sudo docker-compose exec web python manage.py collectstatic --no-input
+    docker-compose up -d --build
+    docker-compose exec web python manage.py migrate
+    docker-compose exec web python ./manage.py loaddata test_fixtures.json
+    docker-compose exec web python manage.py createsuperuser
+    docker-compose exec web python manage.py collectstatic --no-input
 
 Для работы в приложении необходимо зарегистрироваться на главной странице, после чего подтвердить статус пользователя как staff в админ-панели
 

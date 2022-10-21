@@ -10,7 +10,10 @@ services:
       - ./.env
 
   web:
-    image: ${DOCKER_USERNAME}/equipment_project:v1.1
+    build:
+      context: ../equipment_project
+      dockerfile: Dockerfile
+#    image: ${DOCKER_USERNAME}/equipment_project:v1.1
     restart: always
     volumes:
       - static_value:/app/static/

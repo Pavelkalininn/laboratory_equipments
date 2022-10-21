@@ -28,7 +28,7 @@ class CalibrationViewSet(viewsets.ModelViewSet):
         serializer.save(
             creator=get_object_or_404(
                 User,
-                telegram_id=self.request.data.get("telegram_id")
+                telegram_id=self.kwargs.get("telegram_id")
             )
         )
 
@@ -50,7 +50,7 @@ class MovementViewSet(viewsets.ModelViewSet):
         serializer.save(
             creator=get_object_or_404(
                 User,
-                telegram_id=self.request.data.get("telegram_id")
+                telegram_id=self.kwargs.get("telegram_id")
             )
         )
 
@@ -67,7 +67,7 @@ class AttestationViewSet(viewsets.ModelViewSet):
         serializer.save(
             creator=get_object_or_404(
                 User,
-                telegram_id=self.request.data.get("telegram_id")
+                telegram_id=self.kwargs.get("telegram_id")
             )
         )
 
@@ -84,7 +84,7 @@ class RentViewSet(viewsets.ModelViewSet):
         serializer.save(
             creator=get_object_or_404(
                 User,
-                telegram_id=self.request.data.get("telegram_id")
+                telegram_id=self.kwargs.get("telegram_id")
             )
         )
 
@@ -95,7 +95,14 @@ class EquipmentViewSet(viewsets.ModelViewSet):
     pagination_class = None
     permission_classes = [IsStaff, ]
     filterset_class = EquipmentFilter
-    filterset_fields = ('name', 'inventory', 'model', 'serial_number')
+    filterset_fields = (
+        'name',
+        'inventory',
+        'model',
+        'serial_number',
+        'nomenclature_key',
+        'movement'
+    )
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -106,7 +113,15 @@ class EquipmentViewSet(viewsets.ModelViewSet):
         serializer.save(
             creator=get_object_or_404(
                 User,
-                telegram_id=self.request.data.get("telegram_id")
+                telegram_id=self.kwargs.get("telegram_id")
+            )
+        )
+
+    def perform_update(self, serializer):
+        serializer.save(
+            creator=get_object_or_404(
+                User,
+                telegram_id=self.kwargs.get("telegram_id")
             )
         )
 
@@ -123,7 +138,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         serializer.save(
             creator=get_object_or_404(
                 User,
-                telegram_id=self.request.data.get("telegram_id")
+                telegram_id=self.kwargs.get("telegram_id")
             )
         )
 
@@ -140,7 +155,7 @@ class DestinationViewSet(viewsets.ModelViewSet):
         serializer.save(
             creator=get_object_or_404(
                 User,
-                telegram_id=self.request.data.get("telegram_id")
+                telegram_id=self.kwargs.get("telegram_id")
             )
         )
 
@@ -157,6 +172,6 @@ class DocumentViewSet(viewsets.ModelViewSet):
         serializer.save(
             creator=get_object_or_404(
                 User,
-                telegram_id=self.request.data.get("telegram_id")
+                telegram_id=self.kwargs.get("telegram_id")
             )
         )

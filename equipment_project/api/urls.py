@@ -5,19 +5,31 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 
-router.register('equipments', EquipmentViewSet, basename='equipment-list')
 router.register(
-    'calibrations',
+    '(?P<telegram_id>[0-9]+)/equipments',
+    EquipmentViewSet,
+    basename='equipment-list'
+)
+router.register(
+    '(?P<telegram_id>[0-9]+)/calibrations',
     CalibrationViewSet,
     basename='calibration-list'
 )
-router.register('movements', MovementViewSet, basename='movement-list')
 router.register(
-    'attestations',
+    '(?P<telegram_id>[0-9]+)/movements',
+    MovementViewSet,
+    basename='movement-list'
+)
+router.register(
+    '(?P<telegram_id>[0-9]+)/attestations',
     AttestationViewSet,
     basename='attestation-list'
 )
-router.register('rents', RentViewSet, basename='rent-list')
+router.register(
+    '(?P<telegram_id>[0-9]+)/rents',
+    RentViewSet,
+    basename='rent-list'
+)
 
 urlpatterns = [
     path('v1/', include(router.urls)),
