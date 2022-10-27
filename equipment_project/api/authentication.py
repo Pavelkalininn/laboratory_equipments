@@ -6,7 +6,7 @@ User = get_user_model()
 
 class BotAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
-        telegram_id = request.data.get('telegram_id')
+        telegram_id = request.headers.get('Authorization')
 
         if not telegram_id:
             return None

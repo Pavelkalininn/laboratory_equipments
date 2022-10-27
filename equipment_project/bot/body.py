@@ -7,13 +7,13 @@ import requests
 from requests import RequestException
 from telebot import types
 
-from bot.settings import (USER_FORM, EQUIPMENT_CONST, WEB_HOST,
-                          ANY_THINK_WAS_WRONG, LOGIN, USER_CREATE_NAMES,
-                          EQUIPMENT_CREATE_NAMES,
-                          EQUIPMENT_ADD, VARIANTS, ADMIN_ID, STAFF_ACCEPT,
-                          INCORRECT_COMMAND,
-                          EQUIPMENT_SEARCH, EQUIPMENTS_FILTER_FIELDS,
-                          MAX_COUNT, STAFF_DECLINE)
+from settings import (USER_FORM, EQUIPMENT_CONST, WEB_HOST,
+                      ANY_THINK_WAS_WRONG, LOGIN, USER_CREATE_NAMES,
+                      EQUIPMENT_CREATE_NAMES,
+                      EQUIPMENT_ADD, VARIANTS, ADMIN_ID, STAFF_ACCEPT,
+                      INCORRECT_COMMAND,
+                      EQUIPMENT_SEARCH, EQUIPMENTS_FILTER_FIELDS,
+                      MAX_COUNT, STAFF_DECLINE)
 
 user_status = {}
 
@@ -51,34 +51,6 @@ class BotMessage:
                 result.append(EQUIPMENT_CONST.format(**equipment))
         return result
 
-    def user_create(
-            self,
-            data: dict = None
-    ) -> Union[list, str]:
-        try:
-            data['telegram_id'] = self.message.chat.id
-            api_answer = requests.post(
-                f'http://{WEB_HOST}/api/users/',
-                data=data,
-                timeout=30
-            )
-            if api_answer.status_code not in [
-                HTTPStatus.CREATED,
-            ]:
-                logging.error('Некорректный статус от API', exc_info=True)
-                return (
-                        ANY_THINK_WAS_WRONG
-                        + ' Код: /n '
-                        + str(api_answer.status_code)
-                        + " "
-                        + str(api_answer.json().values())
-                )
-            return api_answer.json()
-        except RequestException as error:
-            logging.error(error, exc_info=True)
-        except JSONDecodeError as error:
-            logging.error(error, exc_info=True)
-
     def get_api_answer(
             self,
             message: str,
@@ -86,11 +58,11 @@ class BotMessage:
             endpoint: str,
             data: dict = None
     ) -> Union[list, str]:
-        data['telegram_id'] = self.message.chat.id
         try:
             api_answer = getattr(requests, method)(
-                f'http://{WEB_HOST}/api/v1/{endpoint}/?{message}',
+                f'http://{WEB_HOST}:8000/api/{endpoint}/?{message}',
                 data=data,
+                headers={'Authorization': str(self.message.chat.id)},
                 timeout=30
             )
             if api_answer.status_code not in [
@@ -110,6 +82,10 @@ class BotMessage:
             logging.error(error, exc_info=True)
         except JSONDecodeError as error:
             logging.error(error, exc_info=True)
+
+    async def is_registered(self):
+        await self.get_api_answer('', 'get', 'v1/user')
+
 
     async def data_collect(
             self,
@@ -132,9 +108,9 @@ class BotMessage:
             )
         else:
             if names == USER_CREATE_NAMES:
-                answer = self.user_create(data)
+                answer = self.get_api_answer("", "post", "users", data)
             else:
-                answer = self.get_api_answer("", "post", "equipments", data)
+                answer = self.get_api_answer("", "post", "v1/equipments", data)
             await self.send_message(
                 self.json_parser(answer)[0],
                 self.message.chat.id,
@@ -165,7 +141,7 @@ class BotMessage:
                     self.get_api_answer(
                         '',
                         'patch',
-                        'staff/staff_change',
+                        'v1/staff/staff_change',
                         data={'is_staff': is_staff, 'new_user_id': new_user_id}
                     )
                 )[0],
@@ -220,7 +196,7 @@ class BotMessage:
                 self.get_api_answer(
                     f'{action}={self.message.text}',
                     'get',
-                    'equipments')
+                    'v1/equipments')
             )
             if len(equipments) > MAX_COUNT:
                 equipments = equipments[:MAX_COUNT]

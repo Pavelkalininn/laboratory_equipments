@@ -2,8 +2,8 @@ import asyncio
 import logging
 import sys
 
-from bot.body import user_status, BotMessage
-from bot.settings import ADMIN_ID, WEB_HOST, TELEGRAM_TOKEN, LOGIN, INFO
+from body import user_status, BotMessage
+from settings import ADMIN_ID, WEB_HOST, TELEGRAM_TOKEN, LOGIN, INFO
 from exceptions import BotError
 from telebot import ExceptionHandler
 from telebot.async_telebot import AsyncTeleBot
@@ -34,13 +34,13 @@ def main():
         exception_handler=ExceptionHandler()
     )
 
+    async def text_parser(message: Message):
+        message = BotMessage(bot, message)
+        await message.text_parser()
+
     @bot.message_handler(commands=['start'])
     async def start(message: Message):
-        if user_status.get(message.chat.id):
-            user_status.pop(message.chat.id)
-        else:
-            user_status[message.chat.id] = (LOGIN, '', {})
-            await bot.send_message(message.chat.id, 'Введите почту')
+        await text_parser(message)
 
     @bot.message_handler(commands=['help', 'h'])
     async def help_text(message: Message):
@@ -48,8 +48,7 @@ def main():
 
     @bot.message_handler(content_types=['text'])
     async def input_text(message: Message):
-        message = BotMessage(bot, message)
-        await message.text_parser()
+        await text_parser(message)
 
     asyncio.run(
         bot.polling(none_stop=True, timeout=60, request_timeout=600)
