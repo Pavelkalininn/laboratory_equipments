@@ -1,16 +1,23 @@
+from rest_framework.decorators import action
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
+from api.authentication import BotAuthentication
 from api.filters import EquipmentFilter
-from api.permissions import IsStaff
+from api.permissions import IsStaff, IsSuperUser
 from api.serializers import (AttestationSerializer, CalibrationSerializer,
                              DestinationSerializer, DocumentSerializer,
                              EquipmentCreateSerializer, EquipmentSerializer,
                              MovementCreateSerializer, MovementSerializer,
-                             OrganizationSerializer, RentSerializer)
+                             OrganizationSerializer, RentSerializer,
+                             UserSerializer)
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
 from rest_framework import viewsets
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, GenericAPIView
 from rest_framework.permissions import SAFE_METHODS
 
 User = get_user_model()
@@ -22,14 +29,12 @@ class CalibrationViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
+    authentication_classes = [BotAuthentication, ]
     filterset_fields = ('equipment', 'name')
 
     def perform_create(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
 
 
@@ -39,6 +44,7 @@ class MovementViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
+    authentication_classes = [BotAuthentication, ]
     filterset_fields = ('equipment', 'destination')
 
     def get_serializer_class(self):
@@ -48,10 +54,7 @@ class MovementViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
 
 
@@ -61,14 +64,12 @@ class AttestationViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
+    authentication_classes = [BotAuthentication, ]
     filterset_fields = ('equipment', 'name')
 
     def perform_create(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
 
 
@@ -78,14 +79,12 @@ class RentViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
+    authentication_classes = [BotAuthentication, ]
     filterset_fields = ('equipment', 'renter', 'owner')
 
     def perform_create(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
 
 
@@ -94,6 +93,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
+    authentication_classes = [BotAuthentication, ]
     filterset_class = EquipmentFilter
     filterset_fields = (
         'name',
@@ -111,18 +111,12 @@ class EquipmentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
 
     def perform_update(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
 
 
@@ -132,14 +126,12 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
+    authentication_classes = [BotAuthentication, ]
     filterset_fields = ('name',)
 
     def perform_create(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
 
 
@@ -149,14 +141,12 @@ class DestinationViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
+    authentication_classes = [BotAuthentication, ]
     filterset_fields = ('address',)
 
     def perform_create(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
 
 
@@ -166,12 +156,34 @@ class DocumentViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
-    filterset_fields = ('name', )
+    authentication_classes = [BotAuthentication, ]
+    filterset_fields = ('name',)
 
     def perform_create(self, serializer):
         serializer.save(
-            creator=get_object_or_404(
-                User,
-                telegram_id=self.kwargs.get("telegram_id")
-            )
+            creator=self.request.user
         )
+
+
+class StaffViewSet(GenericViewSet, UpdateModelMixin):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsSuperUser, ]
+    authentication_classes = [BotAuthentication, ]
+
+    @action(methods=['patch'], detail=False)
+    def staff_change(self, request):
+        if request.method == 'PATCH':
+            new_user = User.objects.get(
+                telegram_id=request.data.get("new_user_id")
+            )
+            serializer = self.get_serializer(
+                new_user,
+                data={'is_staff': request.data.get('is_staff')},
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            if getattr(new_user, '_prefetched_objects_cache', None):
+                new_user._prefetched_objects_cache = {}
+            return Response(serializer.data)

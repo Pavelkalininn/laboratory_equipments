@@ -1,6 +1,11 @@
+from django.contrib.auth import get_user_model
+
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
 from rest_framework import serializers
+
+
+User = get_user_model()
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -151,3 +156,10 @@ class EquipmentSerializer(EquipmentCreateSerializer):
     calibrations = serializers.StringRelatedField(many=True)
     movements = serializers.StringRelatedField(many=True)
     documents = serializers.StringRelatedField(many=True)
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = User

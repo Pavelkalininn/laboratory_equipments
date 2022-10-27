@@ -1,34 +1,40 @@
 from api.views import (AttestationViewSet, CalibrationViewSet,
-                       EquipmentViewSet, MovementViewSet, RentViewSet)
+                       EquipmentViewSet, MovementViewSet, RentViewSet,
+                       StaffViewSet)
 from django.urls import include, path
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 
 router.register(
-    '(?P<telegram_id>[0-9]+)/equipments',
+    'equipments',
     EquipmentViewSet,
     basename='equipment-list'
 )
 router.register(
-    '(?P<telegram_id>[0-9]+)/calibrations',
+    'calibrations',
     CalibrationViewSet,
     basename='calibration-list'
 )
 router.register(
-    '(?P<telegram_id>[0-9]+)/movements',
+    'movements',
     MovementViewSet,
     basename='movement-list'
 )
 router.register(
-    '(?P<telegram_id>[0-9]+)/attestations',
+    'attestations',
     AttestationViewSet,
     basename='attestation-list'
 )
 router.register(
-    '(?P<telegram_id>[0-9]+)/rents',
+    'rents',
     RentViewSet,
     basename='rent-list'
+)
+
+router.register(
+    'staff',
+    StaffViewSet
 )
 
 urlpatterns = [

@@ -1,18 +1,19 @@
-from equipments.models import User
 from rest_framework import permissions
-from rest_framework.generics import get_object_or_404
 
 
 class IsStaff(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        return get_object_or_404(
-            User,
-            telegram_id=view.kwargs.get("telegram_id")
-        ).is_staff
+        return request.user.is_staff
 
     def has_object_permission(self, request, view, obj):
-        return get_object_or_404(
-            User,
-            telegram_id=view.kwargs.get("telegram_id")
-        ).is_staff
+        return request.user.is_staff
+
+
+class IsSuperUser(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return request.user.is_superuser
+
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_superuser
