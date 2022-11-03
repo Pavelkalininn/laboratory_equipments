@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
+from rest_framework.generics import get_object_or_404
 
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
 from rest_framework import serializers
-
 
 User = get_user_model()
 
@@ -159,7 +159,19 @@ class EquipmentSerializer(EquipmentCreateSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_staff = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        fields = '__all__'
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'telegram_id',
+            'is_staff'
+        )
         model = User
+
+    def get_is_staff(self, obj):
+        return obj.is_staff

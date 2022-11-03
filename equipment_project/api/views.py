@@ -1,5 +1,7 @@
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action
-from rest_framework.mixins import UpdateModelMixin
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.mixins import UpdateModelMixin, CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -14,11 +16,18 @@ from api.serializers import (AttestationSerializer, CalibrationSerializer,
                              UserSerializer)
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
-from equipments.models import (Attestation, Calibration, Destination, Document,
-                               Equipment, Movement, Organization, Rent)
-from rest_framework import viewsets
-from rest_framework.generics import get_object_or_404, GenericAPIView
-from rest_framework.permissions import SAFE_METHODS
+from equipments.models import (
+    Attestation,
+    Calibration,
+    Destination,
+    Document,
+    Equipment,
+    Movement,
+    Organization,
+    Rent,
+)
+from rest_framework import viewsets, status
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, AllowAny
 
 User = get_user_model()
 
@@ -165,11 +174,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
         )
 
 
-class StaffViewSet(GenericViewSet, UpdateModelMixin):
+class UserViewSet(GenericViewSet, UpdateModelMixin, CreateModelMixin):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsSuperUser, ]
-    authentication_classes = [BotAuthentication, ]
+    authentication_classes = (BotAuthentication,)
+
+    def get_authenticators(self):
+        if self.request.method == 'POST':
+            return []
+        return super().get_authenticators()
 
     @action(methods=['patch'], detail=False)
     def staff_change(self, request):
@@ -177,9 +190,11 @@ class StaffViewSet(GenericViewSet, UpdateModelMixin):
             new_user = User.objects.get(
                 telegram_id=request.data.get("new_user_id")
             )
+            is_staff = request.data.get('is_staff')
+            new_user.is_staff = is_staff
             serializer = self.get_serializer(
                 new_user,
-                data={'is_staff': request.data.get('is_staff')},
+                data={'is_staff': is_staff},
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
@@ -187,3 +202,36 @@ class StaffViewSet(GenericViewSet, UpdateModelMixin):
             if getattr(new_user, '_prefetched_objects_cache', None):
                 new_user._prefetched_objects_cache = {}
             return Response(serializer.data)
+
+    @action(methods=['get', 'patch', 'put', 'delete'], detail=False)
+    def me(self, request):
+        if request.method == 'GET':
+            user = User.objects.get(username=request.user.username)
+            serializer = self.get_serializer(user)
+            return Response(serializer.data)
+
+        elif request.method == 'PATCH' or request.method == 'PUT':
+            partial = True if request.method == 'PATCH' else False
+            user = User.objects.get(username=request.user.username)
+            data = request.data.copy()
+            serializer = self.get_serializer(
+                user,
+                data=data,
+                partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            if getattr(user, '_prefetched_objects_cache', None):
+                user._prefetched_objects_cache = {}
+            return Response(serializer.data)
+
+        elif request.method == 'DELETE':
+            raise MethodNotAllowed(method='DELETE')
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return (AllowAny(),)
+        elif self.action == 'me':
+            return (IsAuthenticated(),)
+        return (IsSuperUser(),)
