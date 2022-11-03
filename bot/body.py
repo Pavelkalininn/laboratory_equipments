@@ -96,9 +96,8 @@ class BotMessage:
             if 'inventory' in data and 'serial_number' in data:
                 return [EQUIPMENT_CONST.format(**data)]
             return [data]
-        else:
-            for equipment in data:
-                result.append(EQUIPMENT_CONST.format(**equipment))
+        for equipment in data:
+            result.append(EQUIPMENT_CONST.format(**equipment))
         return result
 
     @staticmethod
@@ -111,15 +110,14 @@ class BotMessage:
                 return api_answer.json()
             if api_answer.status_code == HTTPStatus.FORBIDDEN:
                 return ACCESS_DENIED
-            else:
-                logging.error(
-                    INCORRECT_STATUS.format(status=api_answer.status_code),
-                    exc_info=True)
-                return (
-                    str(api_answer.status_code)
-                    + ' '
-                    + api_answer.text.strip('{}')
-                )
+            logging.error(
+                INCORRECT_STATUS.format(status=api_answer.status_code),
+                exc_info=True)
+            return (
+                str(api_answer.status_code)
+                + ' '
+                + api_answer.text.strip('{}')
+            )
         except JSONDecodeError as error:
             logging.error(error, exc_info=True)
 
