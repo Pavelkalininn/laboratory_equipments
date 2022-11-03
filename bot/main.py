@@ -3,8 +3,8 @@ import logging
 import sys
 
 from body import BotMessage
-from settings import ADMIN_ID, WEB_HOST, TELEGRAM_TOKEN, INFO
 from exceptions import BotError
+from settings import ADMIN_ID, INFO, TELEGRAM_TOKEN, WEB_HOST
 from telebot import ExceptionHandler
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import Message
@@ -20,8 +20,10 @@ def main():
     logging.basicConfig(
         level=logging.INFO,
         handlers=[logging.StreamHandler(sys.stdout), ],
-        format=
-        '[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
+        format=(
+            '[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %('
+            'message)s '
+        )
     )
     logging.info('Запуск бота')
 

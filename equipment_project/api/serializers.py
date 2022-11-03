@@ -1,6 +1,4 @@
 from django.contrib.auth import get_user_model
-from rest_framework.generics import get_object_or_404
-
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
 from rest_framework import serializers
