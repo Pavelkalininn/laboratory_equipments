@@ -2,19 +2,11 @@ from core.templatetags.wrappers import is_staff_user
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 from equipments.models import Equipment
-from web.forms import (
-    AttestationForm,
-    CalibrationForm,
-    EquipmentForm,
-    MovementForm,
-    RentForm,
-)
-from web.utils import (
-    pagination,
-    table_filters,
-    valid_form_saver,
-    valid_equipment_additional_parameter_saver
-)
+from web.forms import (AttestationForm, CalibrationForm, EquipmentForm,
+                       MovementForm, RentForm)
+from web.utils import (pagination, table_filters,
+                       valid_equipment_additional_parameter_saver,
+                       valid_form_saver)
 
 
 @login_required(login_url='users:login')

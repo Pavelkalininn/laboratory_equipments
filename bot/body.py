@@ -1,32 +1,21 @@
 import logging
 from http import HTTPStatus
 from json import JSONDecodeError
-from typing import Union, List
+from typing import List, Union
 
 import requests
 from requests import RequestException
 from rest_framework.request import Request
+from settings import (ACCESS_DENIED, ADDED, ADMIN_ADD_OR_DELETE_YOU, ADMIN_ID,
+                      AUTHORIZATION, DELETED, EQUIPMENT_ADD, EQUIPMENT_CONST,
+                      EQUIPMENT_CREATE_NAMES, EQUIPMENT_SEARCH,
+                      EQUIPMENTS_FILTER_FIELDS, FILL_IN_VALUE, FIND_FIELD,
+                      INCORRECT_COMMAND, INCORRECT_STATUS, LOGIN, MAX_COUNT,
+                      NO_ONE_OBJECT_FIND, STAFF_ACCEPT, STAFF_DECLINE,
+                      SUCCESSFULLY_CREATED, TOO_MANY_RESULTS, UNAUTHORIZED,
+                      USER_CREATE_NAMES, USER_FORM,
+                      USER_SUCCESSFULLY_ADD_OR_DELETE, VARIANTS, WEB_HOST)
 from telebot import types
-
-from settings import (
-    USER_FORM,
-    EQUIPMENT_CONST,
-    WEB_HOST,
-    LOGIN, USER_CREATE_NAMES,
-    EQUIPMENT_CREATE_NAMES,
-    EQUIPMENT_ADD,
-    VARIANTS,
-    ADMIN_ID,
-    STAFF_ACCEPT,
-    INCORRECT_COMMAND,
-    EQUIPMENT_SEARCH,
-    EQUIPMENTS_FILTER_FIELDS,
-    MAX_COUNT,
-    STAFF_DECLINE, UNAUTHORIZED, NO_ONE_OBJECT_FIND, TOO_MANY_RESULTS,
-    FIND_FIELD, ADMIN_ADD_OR_DELETE_YOU, USER_SUCCESSFULLY_ADD_OR_DELETE,
-    DELETED, ADDED, ACCESS_DENIED, INCORRECT_STATUS, AUTHORIZATION,
-    SUCCESSFULLY_CREATED, FILL_IN_VALUE,
-)
 
 
 class MessageInfo:
@@ -127,9 +116,9 @@ class BotMessage:
                     INCORRECT_STATUS.format(status=api_answer.status_code),
                     exc_info=True)
                 return (
-                        str(api_answer.status_code)
-                        + ' '
-                        + api_answer.text.strip('{}')
+                    str(api_answer.status_code)
+                    + ' '
+                    + api_answer.text.strip('{}')
                 )
         except JSONDecodeError as error:
             logging.error(error, exc_info=True)

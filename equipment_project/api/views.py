@@ -1,10 +1,3 @@
-from rest_framework.authentication import BasicAuthentication
-from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
-from rest_framework.mixins import UpdateModelMixin, CreateModelMixin
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
-
 from api.authentication import BotAuthentication
 from api.filters import EquipmentFilter
 from api.permissions import IsStaff, IsSuperUser
@@ -16,18 +9,15 @@ from api.serializers import (AttestationSerializer, CalibrationSerializer,
                              UserSerializer)
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
-from equipments.models import (
-    Attestation,
-    Calibration,
-    Destination,
-    Document,
-    Equipment,
-    Movement,
-    Organization,
-    Rent,
-)
-from rest_framework import viewsets, status
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, AllowAny
+from equipments.models import (Attestation, Calibration, Destination, Document,
+                               Equipment, Movement, Organization, Rent)
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.mixins import CreateModelMixin, UpdateModelMixin
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 User = get_user_model()
 
@@ -202,6 +192,7 @@ class UserViewSet(GenericViewSet, UpdateModelMixin, CreateModelMixin):
             if getattr(new_user, '_prefetched_objects_cache', None):
                 new_user._prefetched_objects_cache = {}
             return Response(serializer.data)
+        raise MethodNotAllowed(method=request.method)
 
     @action(methods=['get', 'patch', 'put', 'delete'], detail=False)
     def me(self, request):

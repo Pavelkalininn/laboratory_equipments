@@ -1,21 +1,12 @@
 from typing import Union
 
 from django.core.paginator import Paginator
-from django.shortcuts import redirect, get_object_or_404
-
+from django.shortcuts import get_object_or_404, redirect
 from equipments.models import Equipment
-from web.const import (
-    COUNT_OF_EQUIPMENT,
-    SIMPLE_FILTERED_FIELDS,
-    MULTI_FILTERED_FIELDS,
-)
-from web.forms import (
-    RentForm,
-    AttestationForm,
-    CalibrationForm,
-    MovementForm,
-    EquipmentForm,
-)
+from web.const import (COUNT_OF_EQUIPMENT, MULTI_FILTERED_FIELDS,
+                       SIMPLE_FILTERED_FIELDS)
+from web.forms import (AttestationForm, CalibrationForm, EquipmentForm,
+                       MovementForm, RentForm)
 
 
 def pagination(posts, request):
@@ -42,10 +33,11 @@ def table_filters(request, equipments):
                             f'{key}s'
                         ).first().id
                     )
-            equipments = equipments.filter(**{
-                f'{key}s__id__in': last_ids,
-                value: filter_parameter}
-                                           )
+            equipments = equipments.filter(
+                **{f'{key}s__id__in': last_ids,
+                   value: filter_parameter
+                   }
+            )
     return equipments
 
 
