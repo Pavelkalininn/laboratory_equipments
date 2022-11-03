@@ -14,5 +14,7 @@ class BotAuthentication(authentication.BaseAuthentication):
         try:
             user = User.objects.get(telegram_id=telegram_id)
         except User.DoesNotExist:
-            raise exceptions.AuthenticationFailed('No such user')
+            raise exceptions.AuthenticationFailed(
+                'Authentication failed, no such user!'
+            )
         return user, None

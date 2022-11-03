@@ -9,6 +9,11 @@ services:
     env_file:
       - ./.env
 
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
   web:
     build:
       context: ../equipment_project
@@ -43,6 +48,7 @@ services:
       - ./.env
     depends_on:
       - web
+      - redis
 
 volumes:
   static_value:

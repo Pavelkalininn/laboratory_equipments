@@ -1,10 +1,20 @@
 from core.templatetags.wrappers import is_staff_user
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from equipments.models import Equipment
-from web.forms import (AttestationForm, CalibrationForm, EquipmentForm,
-                       MovementForm, RentForm)
-from web.utils import pagination, table_filters
+from web.forms import (
+    AttestationForm,
+    CalibrationForm,
+    EquipmentForm,
+    MovementForm,
+    RentForm,
+)
+from web.utils import (
+    pagination,
+    table_filters,
+    valid_form_saver,
+    valid_equipment_additional_parameter_saver
+)
 
 
 @login_required(login_url='users:login')
@@ -32,7 +42,7 @@ def index(request):
 @login_required(login_url='users:login')
 @is_staff_user
 def equipment_get(request, equipment_id):
-    equipments = Equipment.objects.filter(id=equipment_id).select_related(
+    equipments = Equipment.objects.filter(pk=equipment_id).select_related(
         'creator'
     ).prefetch_related(
         'rents',
@@ -53,12 +63,7 @@ def equipment_get(request, equipment_id):
 def equipment_create(request):
     form = EquipmentForm(request.POST or None, files=request.FILES or None, )
     if form.is_valid():
-        new_form = form.save(commit=False)
-        new_form.creator = request.user
-        equipment = form.save()
-        if 'create_and_exit' in request.POST:
-            return redirect('web:equipment_get', equipment.pk)
-        return redirect('web:rent_create', equipment.pk)
+        return valid_form_saver(form, request)
     return render(
         request,
         'equipments/create_form.html',
@@ -69,19 +74,14 @@ def equipment_create(request):
 @login_required(login_url='users:login')
 @is_staff_user
 def equipment_edit(request, equipment_id):
-    equipment = get_object_or_404(Equipment, id=equipment_id)
+    equipment = get_object_or_404(Equipment, pk=equipment_id)
     form = EquipmentForm(
         request.POST or None,
         files=request.FILES or None,
         instance=equipment
     )
     if form.is_valid():
-        new_form = form.save(commit=False)
-        new_form.creator = request.user
-        form.save()
-        if 'create_and_exit' in request.POST:
-            return redirect('web:equipment_get', equipment.pk)
-        return redirect('web:rent_create', equipment.pk)
+        return valid_form_saver(form, request)
     return render(
         request,
         'equipments/create_form.html',
@@ -94,13 +94,12 @@ def equipment_edit(request, equipment_id):
 def rent_create(request, equipment_id):
     form = RentForm(request.POST or None, files=request.FILES or None, )
     if form.is_valid():
-        new_form = form.save(commit=False)
-        new_form.equipment = get_object_or_404(Equipment, id=equipment_id)
-        new_form.creator = request.user
-        new_form.save()
-        if 'create_and_exit' in request.POST:
-            return redirect('web:equipment_get', equipment_id)
-        return redirect('web:attestation_create', equipment_id)
+        return valid_equipment_additional_parameter_saver(
+            form,
+            equipment_id,
+            request,
+            'web:attestation_create'
+        )
     return render(
         request,
         'equipments/create_form.html',
@@ -113,14 +112,12 @@ def rent_create(request, equipment_id):
 def attestation_create(request, equipment_id):
     form = AttestationForm(request.POST or None, files=request.FILES or None, )
     if form.is_valid():
-        form.creator = request.user
-        new_form = form.save(commit=False)
-        new_form.equipment = get_object_or_404(Equipment, id=equipment_id)
-        new_form.creator = request.user
-        new_form.save()
-        if 'create_and_exit' in request.POST:
-            return redirect('web:equipment_get', equipment_id)
-        return redirect('web:calibration_create', equipment_id)
+        return valid_equipment_additional_parameter_saver(
+            form,
+            equipment_id,
+            request,
+            'web:calibration_create'
+        )
     return render(
         request,
         'equipments/create_form.html',
@@ -133,14 +130,12 @@ def attestation_create(request, equipment_id):
 def calibration_create(request, equipment_id):
     form = CalibrationForm(request.POST or None, files=request.FILES or None, )
     if form.is_valid():
-        form.creator = request.user
-        new_form = form.save(commit=False)
-        new_form.equipment = get_object_or_404(Equipment, id=equipment_id)
-        new_form.creator = request.user
-        new_form.save()
-        if 'create_and_exit' in request.POST:
-            return redirect('web:equipment_get', equipment_id)
-        return redirect('web:movement_create', equipment_id)
+        return valid_equipment_additional_parameter_saver(
+            form,
+            equipment_id,
+            request,
+            'web:movement_create'
+        )
     return render(
         request,
         'equipments/create_form.html',
@@ -153,12 +148,11 @@ def calibration_create(request, equipment_id):
 def movement_create(request, equipment_id):
     form = MovementForm(request.POST or None, files=request.FILES or None, )
     if form.is_valid():
-        form.creator = request.user
-        new_form = form.save(commit=False)
-        new_form.equipment = get_object_or_404(Equipment, id=equipment_id)
-        new_form.creator = request.user
-        new_form.save()
-        return redirect('web:equipment_get', equipment_id)
+        return valid_equipment_additional_parameter_saver(
+            form,
+            equipment_id,
+            request
+        )
     return render(
         request,
         'equipments/create_form.html',

@@ -2,8 +2,8 @@ import asyncio
 import logging
 import sys
 
-from body import user_status, BotMessage
-from settings import ADMIN_ID, WEB_HOST, TELEGRAM_TOKEN, LOGIN, INFO
+from body import BotMessage
+from settings import ADMIN_ID, WEB_HOST, TELEGRAM_TOKEN, INFO
 from exceptions import BotError
 from telebot import ExceptionHandler
 from telebot.async_telebot import AsyncTeleBot
@@ -20,7 +20,9 @@ def main():
     logging.basicConfig(
         level=logging.INFO,
         handlers=[logging.StreamHandler(sys.stdout), ],
-        format='%(asctime)s, %(levelname)s, %(message)s, %(name)s')
+        format=
+        '[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
+    )
     logging.info('Запуск бота')
 
     if not check_tokens():
@@ -36,7 +38,7 @@ def main():
 
     async def text_parser(message: Message):
         message = BotMessage(bot, message)
-        await message.text_parser()
+        await message.authorization()
 
     @bot.message_handler(commands=['start'])
     async def start(message: Message):

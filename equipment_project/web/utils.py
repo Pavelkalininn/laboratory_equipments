@@ -1,22 +1,21 @@
+from typing import Union
+
 from django.core.paginator import Paginator
+from django.shortcuts import redirect, get_object_or_404
 
-COUNT_OF_EQUIPMENT = 100
-SIMPLE_FILTERED_FIELDS = {
-    'equipment_id': 'id',
-    'inventory': 'inventory__icontains',
-    'name': 'name__icontains',
-    'serial_number': 'serial_number__icontains',
-    'model': 'model__icontains',
-    'documents': 'documents__name__icontains',
-    'manufacturer': 'manufacturer__icontains'
-}
-
-MULTI_FILTERED_FIELDS = {
-    'rent': 'rents__renter__name__icontains',
-    'attestation': 'attestations__name__icontains',
-    'calibration': 'calibrations__name__icontains',
-    'movement': 'movements__destination__address__icontains'
-}
+from equipments.models import Equipment
+from web.const import (
+    COUNT_OF_EQUIPMENT,
+    SIMPLE_FILTERED_FIELDS,
+    MULTI_FILTERED_FIELDS,
+)
+from web.forms import (
+    RentForm,
+    AttestationForm,
+    CalibrationForm,
+    MovementForm,
+    EquipmentForm,
+)
 
 
 def pagination(posts, request):
@@ -36,15 +35,39 @@ def table_filters(request, equipments):
         if filter_parameter:
             last_ids = []
             for equip in equipments:
-                if getattr(equip, key + 's').first():
+                if getattr(equip, f'{key}s').first():
                     last_ids.append(
                         getattr(
                             equip,
-                            key + 's'
+                            f'{key}s'
                         ).first().id
                     )
             equipments = equipments.filter(**{
-                key + 's__id__in': last_ids,
+                f'{key}s__id__in': last_ids,
                 value: filter_parameter}
-            )
+                                           )
     return equipments
+
+
+def valid_form_saver(form: EquipmentForm, request):
+    new_form = form.save(commit=False)
+    new_form.creator = request.user
+    equipment = form.save()
+    if 'create_and_exit' in request.POST:
+        return redirect('web:equipment_get', equipment.pk)
+    return redirect('web:rent_create', equipment.pk)
+
+
+def valid_equipment_additional_parameter_saver(
+        form: Union[RentForm, AttestationForm, CalibrationForm, MovementForm],
+        equipment_id: int,
+        request,
+        next_redirect_url: str = None
+):
+    new_form = form.save(commit=False)
+    new_form.equipment = get_object_or_404(Equipment, pk=equipment_id)
+    new_form.creator = request.user
+    new_form.save()
+    if not next_redirect_url or 'create_and_exit' in request.POST:
+        return redirect('web:equipment_get', equipment_id)
+    return redirect(next_redirect_url, equipment_id)
