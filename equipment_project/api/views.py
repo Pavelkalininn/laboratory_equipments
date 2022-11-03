@@ -201,7 +201,7 @@ class UserViewSet(GenericViewSet, UpdateModelMixin, CreateModelMixin):
             serializer = self.get_serializer(user)
             return Response(serializer.data)
 
-        elif request.method == 'PATCH' or request.method == 'PUT':
+        if request.method == 'PATCH' or request.method == 'PUT':
             partial = True if request.method == 'PATCH' else False
             user = User.objects.get(username=request.user.username)
             data = request.data.copy()
@@ -216,13 +216,13 @@ class UserViewSet(GenericViewSet, UpdateModelMixin, CreateModelMixin):
                 user._prefetched_objects_cache = {}
             return Response(serializer.data)
 
-        elif request.method == 'DELETE':
+        if request.method == 'DELETE':
             raise MethodNotAllowed(method='DELETE')
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return (AllowAny(),)
-        elif self.action == 'me':
+        if self.action == 'me':
             return (IsAuthenticated(),)
         return (IsSuperUser(),)
