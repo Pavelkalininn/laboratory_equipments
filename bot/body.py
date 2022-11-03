@@ -93,7 +93,7 @@ class BotMessage:
         if isinstance(data, str) or isinstance(data, dict):
             if 'email' in data and 'first_name' in data:
                 return [USER_FORM.format(**data)]
-            elif 'inventory' in data and 'serial_number' in data:
+            if 'inventory' in data and 'serial_number' in data:
                 return [EQUIPMENT_CONST.format(**data)]
             return [data]
         else:
@@ -109,7 +109,7 @@ class BotMessage:
                 HTTPStatus.CREATED,
             ]:
                 return api_answer.json()
-            elif api_answer.status_code == HTTPStatus.FORBIDDEN:
+            if api_answer.status_code == HTTPStatus.FORBIDDEN:
                 return ACCESS_DENIED
             else:
                 logging.error(
@@ -221,7 +221,7 @@ class BotMessage:
                 list(VARIANTS.keys())
             )
 
-        elif self.message.chat.id not in user_status.keys():
+        if self.message.chat.id not in user_status.keys():
             if self.message.text == EQUIPMENT_ADD:
                 return await self.data_collect((EQUIPMENT_ADD, '', {}))
             if self.message.text in VARIANTS:
@@ -235,10 +235,10 @@ class BotMessage:
                     self.message.chat.id, (self.message.text, '', {})
                 )
 
-        elif chat_information[0] in [LOGIN, EQUIPMENT_ADD]:
+        if chat_information[0] in [LOGIN, EQUIPMENT_ADD]:
             return await self.data_collect(chat_information)
 
-        elif (
+        if (
                 chat_information == (EQUIPMENT_SEARCH, '', {})
                 and self.message.text in EQUIPMENTS_FILTER_FIELDS
         ):
@@ -255,7 +255,7 @@ class BotMessage:
                 )
             )
 
-        elif (
+        if (
                 chat_information[0] == EQUIPMENT_SEARCH
                 and chat_information[1]
                 in EQUIPMENTS_FILTER_FIELDS.values()
@@ -286,7 +286,7 @@ class BotMessage:
                 )
             return user_status.delete(self.message.chat.id)
 
-        # elif chat_information == (EQUIPMENT_CHANGE, ):
+        # if chat_information == (EQUIPMENT_CHANGE, ):
         #     ...
 
         await self.send_message(
