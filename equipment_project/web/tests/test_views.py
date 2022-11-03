@@ -4,24 +4,24 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
-from web.tests.core import (ATTESTATION_NAME_FIRST, ATTESTATION_NAME_SECOND,
-                            CALIBRATION_NAME_FIRST, CALIBRATION_NAME_SECOND,
-                            DATE_AUGUST, DATE_FEBRUARY, DATE_JANUARY,
-                            DATE_JUNE, DATE_MARCH, DATE_MAY,
-                            DESTINATION_ADDRESS_FIRST,
-                            DESTINATION_ADDRESS_SECOND,
-                            DOCUMENT_DESCRIPTION_NAME, DOCUMENT_MANUAL_NAME,
-                            DOCUMENT_PATH_FIRST, EQUIPMENT_MODEL_FIRST,
-                            EQUIPMENT_NAME_FIRST,
-                            EQUIPMENT_SERIAL_NUMBER_FIRST,
-                            FIRST_ORGANIZATION_NAME, INVENTORY_NUM_FIRST,
-                            MANUFACTURER_FIRST, MASS_EQUIPMENT_DOCUMENT_PATH,
-                            MASS_EQUIPMENT_MANUFACTURER, MASS_EQUIPMENT_MODEL,
-                            MASS_EQUIPMENT_NAME,
-                            MASS_EQUIPMENT_NOMENCLATURE_KEY,
-                            MASS_EQUIPMENT_SERIAL_NUMBER,
-                            NOMENCLATURE_KEY_FIRST, SECOND_ORGANIZATION_NAME,
-                            USER_NAME_STAFF)
+from web.tests.const import (ATTESTATION_NAME_FIRST, ATTESTATION_NAME_SECOND,
+                             CALIBRATION_NAME_FIRST, CALIBRATION_NAME_SECOND,
+                             DATE_AUGUST, DATE_FEBRUARY, DATE_JANUARY,
+                             DATE_JUNE, DATE_MARCH, DATE_MAY,
+                             DESTINATION_ADDRESS_FIRST,
+                             DESTINATION_ADDRESS_SECOND,
+                             DOCUMENT_DESCRIPTION_NAME, DOCUMENT_MANUAL_NAME,
+                             DOCUMENT_PATH_FIRST, EQUIPMENT_MODEL_FIRST,
+                             EQUIPMENT_NAME_FIRST,
+                             EQUIPMENT_SERIAL_NUMBER_FIRST,
+                             FIRST_ORGANIZATION_NAME, INVENTORY_NUM_FIRST,
+                             MANUFACTURER_FIRST, MASS_EQUIPMENT_DOCUMENT_PATH,
+                             MASS_EQUIPMENT_MANUFACTURER, MASS_EQUIPMENT_MODEL,
+                             MASS_EQUIPMENT_NAME,
+                             MASS_EQUIPMENT_NOMENCLATURE_KEY,
+                             MASS_EQUIPMENT_SERIAL_NUMBER,
+                             NOMENCLATURE_KEY_FIRST, SECOND_ORGANIZATION_NAME,
+                             USER_NAME_STAFF)
 from web.utils import COUNT_OF_EQUIPMENT
 
 User = get_user_model()

@@ -3,11 +3,11 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from equipments.models import Document, Equipment
-from web.tests.core import (DOCUMENT_MANUAL_NAME, DOCUMENT_PATH_FIRST,
-                            EQUIPMENT_MODEL_FIRST, EQUIPMENT_NAME_FIRST,
-                            EQUIPMENT_SERIAL_NUMBER_FIRST, INVENTORY_NUM_FIRST,
-                            MANUFACTURER_FIRST, NOMENCLATURE_KEY_FIRST,
-                            USER_NAME_NON_STAFF, USER_NAME_STAFF)
+from web.tests.const import (DOCUMENT_MANUAL_NAME, DOCUMENT_PATH_FIRST,
+                             EQUIPMENT_MODEL_FIRST, EQUIPMENT_NAME_FIRST,
+                             EQUIPMENT_SERIAL_NUMBER_FIRST, INVENTORY_NUM_FIRST,
+                             MANUFACTURER_FIRST, NOMENCLATURE_KEY_FIRST,
+                             USER_NAME_NON_STAFF, USER_NAME_STAFF)
 
 User = get_user_model()
 
