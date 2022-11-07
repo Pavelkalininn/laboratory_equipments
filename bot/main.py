@@ -3,8 +3,8 @@ import logging
 import sys
 
 from body import BotMessage
+from const import ADMIN_ID, INFO, TELEGRAM_TOKEN, WEB_HOST
 from exceptions import BotError
-from settings import ADMIN_ID, INFO, TELEGRAM_TOKEN, WEB_HOST
 from telebot import ExceptionHandler
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import Message
@@ -38,13 +38,13 @@ def main():
         exception_handler=ExceptionHandler()
     )
 
-    async def text_parser(message: Message):
+    async def text_manager(message: Message):
         message = BotMessage(bot, message)
         await message.authorization()
 
     @bot.message_handler(commands=['start'])
     async def start(message: Message):
-        await text_parser(message)
+        await text_manager(message)
 
     @bot.message_handler(commands=['help', 'h'])
     async def help_text(message: Message):
@@ -52,7 +52,7 @@ def main():
 
     @bot.message_handler(content_types=['text'])
     async def input_text(message: Message):
-        await text_parser(message)
+        await text_manager(message)
 
     asyncio.run(
         bot.polling(none_stop=True, timeout=60, request_timeout=600)
