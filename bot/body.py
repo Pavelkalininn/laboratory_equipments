@@ -327,7 +327,9 @@ class BotMessage:
                     self.message.chat.id,
                     list(VARIANTS.keys())
                 )
-            await self.create_and_send_excel(equipments_without_formatter)
+            if len(equipments) > MAX_COUNT:
+                await self.create_and_send_excel(equipments_without_formatter)
+            self.status = ''
             return user_status.delete(self.message.chat.id)
         return await self.incorrect_command()
 
