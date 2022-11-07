@@ -64,14 +64,14 @@ jobs:
         with:
           push: true
           context: equipment_project/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.2
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.3
 
       - name: Push bot to Docker Hub
         uses: docker/build-push-action@v2
         with:
           push: true
           context: bot/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:v0.2
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:v0.3
 
 #  deploy:
 #    runs-on: ubuntu-latest
