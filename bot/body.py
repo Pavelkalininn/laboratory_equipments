@@ -222,7 +222,7 @@ class BotMessage:
         ):
             new_user_id = self.message.reply_to_message.text.split(
                 'и телеграм id '
-            )[-1].split(' ')[0]
+            )[-1].split('\n')[0]
             is_staff = True if self.message.text == STAFF_ACCEPT else False
             added_or_deleted = ADDED if is_staff else DELETED
             await self.send_message(
