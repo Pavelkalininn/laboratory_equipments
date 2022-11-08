@@ -15,10 +15,10 @@ services:
       - "6379:6379"
 
   web:
-    build:
-      context: ../equipment_project
-      dockerfile: Dockerfile
-#    image: ${DOCKER_USERNAME}/equipment_project:v1.4
+#    build:
+#      context: ../equipment_project
+#      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/equipment_project:v1.4
     restart: always
     volumes:
       - static_value:/app/static/
