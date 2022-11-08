@@ -49,5 +49,9 @@ To run unittest in the folder with the manage.py must be executed:
 
     python manage.py test
 
+Authorization perform by writing user data in Telegram application.
+While user created admin receive message with new user data and question about staff confirmation. 
+After new user admin staff confirmation user receive invitation to application web version url.
+
 
 Author: [__Pavel Kalinin__](https://github.com/Pavelkalininn)

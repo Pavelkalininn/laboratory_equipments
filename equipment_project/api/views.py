@@ -2,11 +2,11 @@ from api.authentication import BotAuthentication
 from api.filters import EquipmentFilter
 from api.permissions import IsStaff, IsSuperUser
 from api.serializers import (AttestationSerializer, CalibrationSerializer,
-                             DestinationSerializer, DocumentSerializer,
-                             EquipmentCreateSerializer, EquipmentSerializer,
-                             MovementCreateSerializer, MovementSerializer,
-                             OrganizationSerializer, RentSerializer,
-                             UserSerializer)
+                             DestinationSerializer, DjoserUserSerializer,
+                             DocumentSerializer, EquipmentCreateSerializer,
+                             EquipmentSerializer, MovementCreateSerializer,
+                             MovementSerializer, OrganizationSerializer,
+                             RentSerializer)
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from equipments.models import (Attestation, Calibration, Destination, Document,
@@ -166,7 +166,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(GenericViewSet, UpdateModelMixin, CreateModelMixin):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = DjoserUserSerializer
     authentication_classes = (BotAuthentication,)
 
     def get_authenticators(self):
