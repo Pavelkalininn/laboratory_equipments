@@ -17,7 +17,7 @@ from const import (ACCESS_DENIED, ADDED, ADMIN_ADD_OR_DELETE_YOU, ADMIN_ID,
                    SUCCESSFULLY_CREATED, TOO_MANY_RESULTS, UNAUTHORIZED,
                    USER_CREATE_NAMES, USER_FORM,
                    USER_SUCCESSFULLY_ADD_OR_DELETE, VARIANTS, WEB_HOST,
-                   WITHOUT_CHANGES)
+                   WITHOUT_CHANGES, API_PORT)
 from requests import RequestException
 from rest_framework.request import Request
 from telebot import types
@@ -118,14 +118,17 @@ class BotMessage:
                 return api_answer.json()
             if api_answer.status_code == HTTPStatus.FORBIDDEN:
                 return ACCESS_DENIED
-            logging.error(
-                INCORRECT_STATUS.format(status=api_answer.status_code),
-                exc_info=True)
-            await self.incorrect_command()
+            if api_answer.status_code == HTTPStatus.BAD_REQUEST:
+                if len(api_answer.json()) > 1:
+                    for error in list(api_answer.json()):
+                        self.data.pop(error.keys()[0])
+                else:
+                    self.data.pop(list(api_answer.json().keys())[0])
+                return (
+                    ' '.join(*api_answer.json().values())
+                )
             return (
-                str(api_answer.status_code)
-                + ' '
-                + api_answer.text.strip('{}')
+                str(api_answer.text)
             )
         except JSONDecodeError as error:
             logging.error(error, exc_info=True)
@@ -139,7 +142,8 @@ class BotMessage:
     ) -> Request:
         try:
             return getattr(requests, method)(
-                f'http://{WEB_HOST}:8000/api/{endpoint}/?{filter_expression}',
+                f'http://{WEB_HOST}:{API_PORT}/api/{endpoint}'
+                f'/?{filter_expression}',
                 data=data,
                 headers={AUTHORIZATION: str(self.message.chat.id)},
                 timeout=30
@@ -151,7 +155,7 @@ class BotMessage:
     async def data_collect(
             self,
     ) -> None:
-        question_num = len(self.data)
+
         if self.status == LOGIN:
             names = USER_CREATE_NAMES
             user_status.set(
@@ -164,21 +168,28 @@ class BotMessage:
                 self.message.chat.id,
                 (EQUIPMENT_ADD, self.type, self.data)
             )
+        question_num = len(self.data)
         if not question_num:
             if self.type == EDIT:
                 self.data['pk'] = self.get_equipment_pk_from_bot_message()
             else:
                 self.data['telegram_id'] = self.message.chat.id
         else:
-            self.data[names[question_num - 1][0]] = self.message.text
+            for name in names:
+                if name not in self.data:
+                    self.data[name] = self.message.text
+                    break
         buttons = (WITHOUT_CHANGES, ) if self.type == EDIT else None
 
         if question_num < len(names):
-            await self.send_message(
-                FILL_IN_VALUE.format(value=names[question_num][-1]),
-                self.message.chat.id,
-                buttons
-            )
+            for field, name in names.items():
+                if field not in self.data:
+                    await self.send_message(
+                        FILL_IN_VALUE.format(value=name),
+                        self.message.chat.id,
+                        buttons
+                    )
+                    break
         else:
             url = "v1/users" if names == USER_CREATE_NAMES else "v1/equipments"
             method = 'post'
@@ -208,7 +219,8 @@ class BotMessage:
                     ADMIN_ID,
                     [STAFF_ACCEPT, STAFF_DECLINE]
                 )
-            user_status.delete(self.message.chat.id)
+            if answer.status_code() != HTTPStatus.BAD_REQUEST:
+                user_status.delete(self.message.chat.id)
 
     def get_equipment_pk_from_bot_message(self) -> str:
         return self.message.reply_to_message.text.split(

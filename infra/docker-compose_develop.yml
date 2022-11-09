@@ -1,0 +1,57 @@
+version: '3.3'
+services:
+
+  db:
+    image: postgres:13.0-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  web:
+    build:
+      context: ../equipment_project
+      dockerfile: Dockerfile
+#    image: ${DOCKER_USERNAME}/equipment_project:v1.5
+    restart: always
+    volumes:
+      - static_value:/app/static/
+      - media_value:/app/media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+
+  nginx:
+    image: nginx:1.19.3
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx_develop.conf:/etc/nginx/conf.d/default.conf
+      - static_value:/static/
+      - media_value:/media/
+    depends_on:
+      - web
+
+#  bot:
+#    build:
+#      context: ../bot/
+#      dockerfile: Dockerfile
+##    image: ${DOCKER_USERNAME}/equipment_project_bot:v0.9
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - web
+#      - redis
+
+volumes:
+  static_value:
+  media_value:
+  postgres_data:

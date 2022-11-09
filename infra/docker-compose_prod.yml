@@ -15,9 +15,6 @@ services:
       - "6379:6379"
 
   web:
-#    build:
-#      context: ../equipment_project
-#      dockerfile: Dockerfile
     image: ${DOCKER_USERNAME}/equipment_project:v1.5
     restart: always
     volumes:
@@ -41,9 +38,6 @@ services:
       - web
 
   bot:
-#    build:
-#      context: ../bot/
-#      dockerfile: Dockerfile
     image: ${DOCKER_USERNAME}/equipment_project_bot:v0.9
     env_file:
       - ./.env
