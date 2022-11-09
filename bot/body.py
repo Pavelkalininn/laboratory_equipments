@@ -180,7 +180,7 @@ class BotMessage:
                 buttons
             )
         else:
-            url = "users" if names == USER_CREATE_NAMES else "v1/equipments"
+            url = "v1/users" if names == USER_CREATE_NAMES else "v1/equipments"
             method = 'post'
             if self.type == EDIT:
                 url += '/' + self.data.get('pk')
