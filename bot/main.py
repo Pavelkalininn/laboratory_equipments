@@ -35,7 +35,7 @@ def main():
         )
     bot = AsyncTeleBot(
         TELEGRAM_TOKEN,
-        # exception_handler=ExceptionHandler()
+        exception_handler=ExceptionHandler()
     )
 
     async def text_manager(message: Message):
