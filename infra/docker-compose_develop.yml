@@ -18,7 +18,6 @@ services:
     build:
       context: ../equipment_project
       dockerfile: Dockerfile
-#    image: ${DOCKER_USERNAME}/equipment_project:v1.5
     restart: always
     volumes:
       - static_value:/app/static/
@@ -44,7 +43,6 @@ services:
 #    build:
 #      context: ../bot/
 #      dockerfile: Dockerfile
-##    image: ${DOCKER_USERNAME}/equipment_project_bot:v0.9
 #    env_file:
 #      - ./.env
 #    depends_on:
