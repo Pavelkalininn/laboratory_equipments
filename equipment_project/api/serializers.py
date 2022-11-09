@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from djoser.serializers import UserSerializer
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from equipments.models import (Attestation, Calibration, Destination, Document,
                                Equipment, Movement, Organization, Rent)
 from rest_framework import serializers
@@ -157,7 +157,7 @@ class EquipmentSerializer(EquipmentCreateSerializer):
     documents = serializers.StringRelatedField(many=True)
 
 
-class DjoserUserSerializer(UserSerializer):
+class DjoserUserUpdateSerializer(UserSerializer):
     is_staff = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -169,6 +169,26 @@ class DjoserUserSerializer(UserSerializer):
             'email',
             'telegram_id',
             'is_staff'
+        )
+        model = User
+
+    def get_is_staff(self, obj):
+        return obj.is_staff
+
+
+class DjoserUserCreateSerializer(UserCreateSerializer):
+    is_staff = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'telegram_id',
+            'is_staff',
+            'password'
         )
         model = User
 
