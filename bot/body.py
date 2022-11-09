@@ -8,16 +8,15 @@ from typing import List, Union
 import pandas
 import requests
 from const import (ACCESS_DENIED, ADDED, ADMIN_ADD_OR_DELETE_YOU, ADMIN_ID,
-                   AUTHORIZATION, DELETED, EDIT, EQUIPMENT_ADD,
+                   API_PORT, AUTHORIZATION, DELETED, EDIT, EQUIPMENT_ADD,
                    EQUIPMENT_CHANGE, EQUIPMENT_CONST, EQUIPMENT_CREATE_NAMES,
                    EQUIPMENT_SEARCH, EQUIPMENTS, EQUIPMENTS_FILTER_FIELDS,
                    EXCEL_HEADERS, FILL_IN_VALUE, FIND_FIELD, INCORRECT_COMMAND,
-                   INCORRECT_STATUS, LOGIN, MAX_COUNT, NO_ONE_OBJECT_FIND,
-                   PASS_VALUES, STAFF_ACCEPT, STAFF_DECLINE,
-                   SUCCESSFULLY_CREATED, TOO_MANY_RESULTS, UNAUTHORIZED,
-                   USER_CREATE_NAMES, USER_FORM,
-                   USER_SUCCESSFULLY_ADD_OR_DELETE, VARIANTS, WEB_HOST,
-                   WITHOUT_CHANGES)
+                   LOGIN, MAX_COUNT, NO_ONE_OBJECT_FIND, PASS_VALUES,
+                   STAFF_ACCEPT, STAFF_DECLINE, SUCCESSFULLY_CREATED,
+                   TOO_MANY_RESULTS, UNAUTHORIZED, USER_CREATE_NAMES,
+                   USER_FORM, USER_SUCCESSFULLY_ADD_OR_DELETE, VARIANTS,
+                   WEB_HOST, WITHOUT_CHANGES)
 from requests import RequestException
 from rest_framework.request import Request
 from telebot import types
@@ -118,14 +117,17 @@ class BotMessage:
                 return api_answer.json()
             if api_answer.status_code == HTTPStatus.FORBIDDEN:
                 return ACCESS_DENIED
-            logging.error(
-                INCORRECT_STATUS.format(status=api_answer.status_code),
-                exc_info=True)
-            await self.incorrect_command()
+            if api_answer.status_code == HTTPStatus.BAD_REQUEST:
+                if len(api_answer.json()) > 1:
+                    for error in list(api_answer.json()):
+                        self.data.pop(error.keys()[0])
+                else:
+                    self.data.pop(list(api_answer.json().keys())[0])
+                return (
+                    ' '.join(*api_answer.json().values())
+                )
             return (
-                str(api_answer.status_code)
-                + ' '
-                + api_answer.text.strip('{}')
+                str(api_answer.text)
             )
         except JSONDecodeError as error:
             logging.error(error, exc_info=True)
@@ -139,7 +141,8 @@ class BotMessage:
     ) -> Request:
         try:
             return getattr(requests, method)(
-                f'http://{WEB_HOST}:8000/api/{endpoint}/?{filter_expression}',
+                f'http://{WEB_HOST}:{API_PORT}/api/{endpoint}'
+                f'/?{filter_expression}',
                 data=data,
                 headers={AUTHORIZATION: str(self.message.chat.id)},
                 timeout=30
@@ -148,67 +151,75 @@ class BotMessage:
         except RequestException as error:
             logging.error(error, exc_info=True)
 
-    async def data_collect(
-            self,
-    ) -> None:
-        question_num = len(self.data)
-        if self.status == LOGIN:
-            names = USER_CREATE_NAMES
-            user_status.set(
-                self.message.chat.id,
-                (LOGIN, self.type, self.data)
+    async def send_admin_user_apply_message(self, names, answer):
+        if (
+                names == USER_CREATE_NAMES
+                and answer.status_code == HTTPStatus.CREATED
+        ):
+            await self.send_message(
+                self.text_formatter(
+                    await self.status_code_parser(answer)
+                )[0],
+                ADMIN_ID,
+                [STAFF_ACCEPT, STAFF_DECLINE]
             )
-        else:
-            names = EQUIPMENT_CREATE_NAMES
-            user_status.set(
-                self.message.chat.id,
-                (EQUIPMENT_ADD, self.type, self.data)
-            )
+
+    def data_field_fill_in(self, question_num, names):
         if not question_num:
             if self.type == EDIT:
                 self.data['pk'] = self.get_equipment_pk_from_bot_message()
             else:
                 self.data['telegram_id'] = self.message.chat.id
         else:
-            self.data[names[question_num - 1][0]] = self.message.text
+            for name in names:
+                if name not in self.data:
+                    self.data[name] = self.message.text
+                    break
+
+    async def data_collect(
+            self,
+    ) -> None:
+        names = USER_CREATE_NAMES if self.status == LOGIN else (
+            EQUIPMENT_CREATE_NAMES
+        )
+        user_status.set(
+            self.message.chat.id,
+            (self.status, self.type, self.data)
+        )
+        question_num = len(self.data)
+        self.data_field_fill_in(question_num, names)
         buttons = (WITHOUT_CHANGES, ) if self.type == EDIT else None
 
         if question_num < len(names):
-            await self.send_message(
-                FILL_IN_VALUE.format(value=names[question_num][-1]),
-                self.message.chat.id,
-                buttons
-            )
-        else:
-            url = "v1/users" if names == USER_CREATE_NAMES else "v1/equipments"
-            method = 'post'
-            if self.type == EDIT:
-                url += '/' + self.data.get('pk')
-                new_data = {}
-                for key, value in self.data.items():
-                    if value not in PASS_VALUES:
-                        new_data[key] = value
-                self.data = new_data
-                method = 'patch'
+            for field, name in names.items():
+                if field not in self.data:
+                    await self.send_message(
+                        FILL_IN_VALUE.format(value=name),
+                        self.message.chat.id,
+                        buttons
+                    )
+                    return
+        url = "v1/users" if names == USER_CREATE_NAMES else "v1/equipments"
+        method = 'post'
+        if self.type == EDIT:
+            url += '/' + self.data.get('pk')
+            new_data = {}
+            for key, value in self.data.items():
+                if value not in PASS_VALUES:
+                    new_data[key] = value
+            self.data = new_data
+            method = 'patch'
 
-            answer = self.get_api_answer('', method, url, self.data)
-            await self.send_message(
-                self.text_formatter(await self.status_code_parser(answer))[0],
-                self.message.chat.id,
-                list(VARIANTS.keys())
-            )
-            if (
-                    names == USER_CREATE_NAMES
-                    and answer.status_code == HTTPStatus.CREATED
-            ):
-                await self.send_message(
-                    self.text_formatter(
-                        await self.status_code_parser(answer)
-                    )[0],
-                    ADMIN_ID,
-                    [STAFF_ACCEPT, STAFF_DECLINE]
-                )
+        answer = self.get_api_answer('', method, url, self.data)
+        await self.send_message(
+            self.text_formatter(await self.status_code_parser(answer))[0],
+            self.message.chat.id,
+            list(VARIANTS.keys())
+        )
+        await self.send_admin_user_apply_message(names, answer)
+        if answer.status_code() != HTTPStatus.BAD_REQUEST:
             user_status.delete(self.message.chat.id)
+        return
 
     def get_equipment_pk_from_bot_message(self) -> str:
         return self.message.reply_to_message.text.split(
