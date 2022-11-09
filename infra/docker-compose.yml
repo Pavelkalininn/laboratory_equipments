@@ -44,7 +44,7 @@ services:
 #    build:
 #      context: ../bot/
 #      dockerfile: Dockerfile
-    image: ${DOCKER_USERNAME}/equipment_project_bot:v0.8
+    image: ${DOCKER_USERNAME}/equipment_project_bot:v0.9
     env_file:
       - ./.env
     depends_on:
