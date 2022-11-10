@@ -1,4 +1,6 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import (
+    PermissionDenied,
+)
 
 
 def is_staff_user(function):

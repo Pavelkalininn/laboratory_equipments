@@ -1,23 +1,67 @@
-from api.authentication import BotAuthentication
-from api.filters import EquipmentFilter
-from api.permissions import IsStaff, IsSuperUser
-from api.serializers import (AttestationSerializer, CalibrationSerializer,
-                             DestinationSerializer, DjoserUserCreateSerializer,
-                             DjoserUserUpdateSerializer, DocumentSerializer,
-                             EquipmentSerializer, MovementCreateSerializer,
-                             MovementSerializer, OrganizationSerializer,
-                             RentSerializer)
-from django.contrib.auth import get_user_model
-from django_filters.rest_framework import DjangoFilterBackend
-from equipments.models import (Attestation, Calibration, Destination, Document,
-                               Equipment, Movement, Organization, Rent)
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
-from rest_framework.mixins import CreateModelMixin, UpdateModelMixin
-from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
+from api.authentication import (
+    BotAuthentication,
+)
+from api.filters import (
+    EquipmentFilter,
+)
+from api.permissions import (
+    IsStaff,
+    IsSuperUser,
+)
+from api.serializers import (
+    AttestationSerializer,
+    CalibrationSerializer,
+    DestinationSerializer,
+    DjoserUserCreateSerializer,
+    DjoserUserUpdateSerializer,
+    DocumentSerializer,
+    EquipmentSerializer,
+    MovementCreateSerializer,
+    MovementSerializer,
+    OrganizationSerializer,
+    RentSerializer,
+)
+from django.contrib.auth import (
+    get_user_model,
+)
+from django_filters.rest_framework import (
+    DjangoFilterBackend,
+)
+from equipments.models import (
+    Attestation,
+    Calibration,
+    Destination,
+    Document,
+    Equipment,
+    Movement,
+    Organization,
+    Rent,
+)
+from rest_framework import (
+    status,
+    viewsets,
+)
+from rest_framework.decorators import (
+    action,
+)
+from rest_framework.exceptions import (
+    MethodNotAllowed,
+)
+from rest_framework.mixins import (
+    CreateModelMixin,
+    UpdateModelMixin,
+)
+from rest_framework.permissions import (
+    SAFE_METHODS,
+    AllowAny,
+    IsAuthenticated,
+)
+from rest_framework.response import (
+    Response,
+)
+from rest_framework.viewsets import (
+    GenericViewSet,
+)
 
 User = get_user_model()
 

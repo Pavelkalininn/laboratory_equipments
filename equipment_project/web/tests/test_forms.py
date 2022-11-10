@@ -1,25 +1,57 @@
-from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
-from django.urls import reverse
-from equipments.models import (Attestation, Calibration, Destination, Document,
-                               Equipment, Movement, Organization, Rent)
-from web.tests.const import (ATTESTATION_NAME_FIRST, ATTESTATION_NAME_SECOND,
-                             CALIBRATION_NAME_FIRST, CALIBRATION_NAME_SECOND,
-                             DATE_AUGUST, DATE_FEBRUARY, DATE_JANUARY,
-                             DATE_JUNE, DATE_MARCH, DATE_MAY,
-                             DESTINATION_ADDRESS_FIRST,
-                             DESTINATION_ADDRESS_SECOND,
-                             DOCUMENT_DESCRIPTION_NAME, DOCUMENT_MANUAL_NAME,
-                             DOCUMENT_PATH_FIRST, DOCUMENT_PATH_SECOND,
-                             EQUIPMENT_MODEL_FIRST, EQUIPMENT_MODEL_SECOND,
-                             EQUIPMENT_NAME_FIRST, EQUIPMENT_NAME_SECOND,
-                             EQUIPMENT_SERIAL_NUMBER_FIRST,
-                             EQUIPMENT_SERIAL_NUMBER_SECOND,
-                             FIRST_ORGANIZATION_NAME, INVENTORY_NUM_FIRST,
-                             INVENTORY_NUM_SECOND, MANUFACTURER_FIRST,
-                             MANUFACTURER_SECOND, NEW_NAME,
-                             NOMENCLATURE_KEY_FIRST, NOMENCLATURE_KEY_SECOND,
-                             SECOND_ORGANIZATION_NAME, USER_NAME_STAFF)
+from django.contrib.auth import (
+    get_user_model,
+)
+from django.test import (
+    Client,
+    TestCase,
+)
+from django.urls import (
+    reverse,
+)
+from equipments.models import (
+    Attestation,
+    Calibration,
+    Destination,
+    Document,
+    Equipment,
+    Movement,
+    Organization,
+    Rent,
+)
+from web.tests.const import (
+    ATTESTATION_NAME_FIRST,
+    ATTESTATION_NAME_SECOND,
+    CALIBRATION_NAME_FIRST,
+    CALIBRATION_NAME_SECOND,
+    DATE_AUGUST,
+    DATE_FEBRUARY,
+    DATE_JANUARY,
+    DATE_JUNE,
+    DATE_MARCH,
+    DATE_MAY,
+    DESTINATION_ADDRESS_FIRST,
+    DESTINATION_ADDRESS_SECOND,
+    DOCUMENT_DESCRIPTION_NAME,
+    DOCUMENT_MANUAL_NAME,
+    DOCUMENT_PATH_FIRST,
+    DOCUMENT_PATH_SECOND,
+    EQUIPMENT_MODEL_FIRST,
+    EQUIPMENT_MODEL_SECOND,
+    EQUIPMENT_NAME_FIRST,
+    EQUIPMENT_NAME_SECOND,
+    EQUIPMENT_SERIAL_NUMBER_FIRST,
+    EQUIPMENT_SERIAL_NUMBER_SECOND,
+    FIRST_ORGANIZATION_NAME,
+    INVENTORY_NUM_FIRST,
+    INVENTORY_NUM_SECOND,
+    MANUFACTURER_FIRST,
+    MANUFACTURER_SECOND,
+    NEW_NAME,
+    NOMENCLATURE_KEY_FIRST,
+    NOMENCLATURE_KEY_SECOND,
+    SECOND_ORGANIZATION_NAME,
+    USER_NAME_STAFF,
+)
 
 User = get_user_model()
 

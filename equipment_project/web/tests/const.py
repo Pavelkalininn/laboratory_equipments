@@ -1,4 +1,6 @@
-from datetime import date
+from datetime import (
+    date,
+)
 
 FIRST_ORGANIZATION_NAME = 'организация1'
 SECOND_ORGANIZATION_NAME = 'организация2'

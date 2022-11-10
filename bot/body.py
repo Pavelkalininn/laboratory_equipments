@@ -1,26 +1,67 @@
 import datetime
 import logging
 import os
-from http import HTTPStatus
-from json import JSONDecodeError
-from typing import List, Union
+from http import (
+    HTTPStatus,
+)
+from json import (
+    JSONDecodeError,
+)
+from typing import (
+    List,
+    Union,
+)
 
 import pandas
 import requests
-from const import (ACCESS_DENIED, ADDED, ADMIN_ADD_OR_DELETE_YOU, ADMIN_ID,
-                   API_PORT, AUTHORIZATION, DELETED, EDIT, EQUIPMENT_ADD,
-                   EQUIPMENT_CHANGE, EQUIPMENT_CONST, EQUIPMENT_CREATE_NAMES,
-                   EQUIPMENT_SEARCH, EQUIPMENTS, EQUIPMENTS_FILTER_FIELDS,
-                   EXCEL_HEADERS, FILL_IN_VALUE, FIND_FIELD, INCORRECT_COMMAND,
-                   LOGIN, MAX_COUNT, NO_ONE_OBJECT_FIND, PASS_VALUES,
-                   STAFF_ACCEPT, STAFF_DECLINE, SUCCESSFULLY_CREATED,
-                   TOO_MANY_RESULTS, UNAUTHORIZED, USER_CREATE_NAMES,
-                   USER_FORM, USER_SUCCESSFULLY_ADD_OR_DELETE, VARIANTS,
-                   WEB_HOST, WITHOUT_CHANGES)
-from requests import RequestException
-from rest_framework.request import Request
-from telebot import types
-from telebot.async_telebot import AsyncTeleBot
+from const import (
+    ACCESS_DENIED,
+    ADDED,
+    ADMIN_ADD_OR_DELETE_YOU,
+    ADMIN_ID,
+    API_PORT,
+    AUTHORIZATION,
+    DELETED,
+    EDIT,
+    EQUIPMENT_ADD,
+    EQUIPMENT_CHANGE,
+    EQUIPMENT_CONST,
+    EQUIPMENT_CREATE_NAMES,
+    EQUIPMENT_SEARCH,
+    EQUIPMENTS,
+    EQUIPMENTS_FILTER_FIELDS,
+    EXCEL_HEADERS,
+    FILL_IN_VALUE,
+    FIND_FIELD,
+    INCORRECT_COMMAND,
+    LOGIN,
+    MAX_COUNT,
+    NO_ONE_OBJECT_FIND,
+    PASS_VALUES,
+    STAFF_ACCEPT,
+    STAFF_DECLINE,
+    SUCCESSFULLY_CREATED,
+    TOO_MANY_RESULTS,
+    UNAUTHORIZED,
+    USER_CREATE_NAMES,
+    USER_FORM,
+    USER_SUCCESSFULLY_ADD_OR_DELETE,
+    VARIANTS,
+    WEB_HOST,
+    WITHOUT_CHANGES,
+)
+from requests import (
+    RequestException,
+)
+from rest_framework.request import (
+    Request,
+)
+from telebot import (
+    types,
+)
+from telebot.async_telebot import (
+    AsyncTeleBot,
+)
 
 
 class MessageInfo:

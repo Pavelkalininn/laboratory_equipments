@@ -1,7 +1,20 @@
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from equipments.models import (Attestation, Calibration, Destination, Document,
-                               Equipment, Movement, Organization, Rent, User)
+from django.contrib import (
+    admin,
+)
+from django.contrib.auth.admin import (
+    UserAdmin,
+)
+from equipments.models import (
+    Attestation,
+    Calibration,
+    Destination,
+    Document,
+    Equipment,
+    Movement,
+    Organization,
+    Rent,
+    User,
+)
 
 admin.site.empty_value_display = '-пусто-'
 
