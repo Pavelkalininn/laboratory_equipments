@@ -4,7 +4,7 @@ from api.permissions import IsStaff, IsSuperUser
 from api.serializers import (AttestationSerializer, CalibrationSerializer,
                              DestinationSerializer, DjoserUserCreateSerializer,
                              DjoserUserUpdateSerializer, DocumentSerializer,
-                             EquipmentCreateSerializer, EquipmentSerializer,
+                             EquipmentSerializer,
                              MovementCreateSerializer, MovementSerializer,
                              OrganizationSerializer, RentSerializer)
 from django.contrib.auth import get_user_model
@@ -92,6 +92,7 @@ class EquipmentViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
+    serializer_class = EquipmentSerializer
     authentication_classes = [BotAuthentication, ]
     filterset_class = EquipmentFilter
     filterset_fields = (
@@ -102,11 +103,6 @@ class EquipmentViewSet(viewsets.ModelViewSet):
         'nomenclature_key',
         'movement'
     )
-
-    def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS:
-            return EquipmentSerializer
-        return EquipmentCreateSerializer
 
     def perform_create(self, serializer):
         serializer.save(
