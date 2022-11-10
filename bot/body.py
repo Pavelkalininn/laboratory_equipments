@@ -1,41 +1,83 @@
 import datetime
 import logging
 import os
-from http import HTTPStatus
-from json import JSONDecodeError
-from typing import List, Union
+from http import (
+    HTTPStatus,
+)
+from json import (
+    JSONDecodeError,
+)
+from typing import (
+    List,
+    Union,
+)
 
 import pandas
 import requests
-from const import (ACCESS_DENIED, ADDED, ADMIN_ADD_OR_DELETE_YOU, ADMIN_ID,
-                   API_PORT, AUTHORIZATION, DELETED, EDIT, EQUIPMENT_ADD,
-                   EQUIPMENT_CHANGE, EQUIPMENT_CONST, EQUIPMENT_CREATE_NAMES,
-                   EQUIPMENT_SEARCH, EQUIPMENTS, EQUIPMENTS_FILTER_FIELDS,
-                   EXCEL_HEADERS, FILL_IN_VALUE, FIND_FIELD, INCORRECT_COMMAND,
-                   LOGIN, MAX_COUNT, NO_ONE_OBJECT_FIND, PASS_VALUES,
-                   STAFF_ACCEPT, STAFF_DECLINE, SUCCESSFULLY_CREATED,
-                   TOO_MANY_RESULTS, UNAUTHORIZED, USER_CREATE_NAMES,
-                   USER_FORM, USER_SUCCESSFULLY_ADD_OR_DELETE, VARIANTS,
-                   WEB_HOST, WITHOUT_CHANGES)
-from requests import RequestException
-from rest_framework.request import Request
-from telebot import types
+from const import (
+    ACCESS_DENIED,
+    ADDED,
+    ADMIN_ADD_OR_DELETE_YOU,
+    ADMIN_ID,
+    API_PORT,
+    AUTHORIZATION,
+    DELETED,
+    EDIT,
+    EQUIPMENT_ADD,
+    EQUIPMENT_CHANGE,
+    EQUIPMENT_CONST,
+    EQUIPMENT_CREATE_NAMES,
+    EQUIPMENT_SEARCH,
+    EQUIPMENTS,
+    EQUIPMENTS_FILTER_FIELDS,
+    EXCEL_HEADERS,
+    FILL_IN_VALUE,
+    FIND_FIELD,
+    INCORRECT_COMMAND,
+    LOGIN,
+    MAX_COUNT,
+    NO_ONE_OBJECT_FIND,
+    PASS_VALUES,
+    STAFF_ACCEPT,
+    STAFF_DECLINE,
+    SUCCESSFULLY_CREATED,
+    TOO_MANY_RESULTS,
+    UNAUTHORIZED,
+    USER_CREATE_NAMES,
+    USER_FORM,
+    USER_SUCCESSFULLY_ADD_OR_DELETE,
+    VARIANTS,
+    WEB_HOST,
+    WITHOUT_CHANGES,
+)
+from requests import (
+    RequestException,
+)
+from rest_framework.request import (
+    Request,
+)
+from telebot import (
+    types,
+)
+from telebot.async_telebot import (
+    AsyncTeleBot,
+)
 
 
 class MessageInfo:
     database = {}
 
-    def get(self, key):
+    def get(self, key: int) -> tuple:
         return self.database.get(key)
 
-    def set(self, key: int, value: tuple):
+    def set(self, key: int, value: tuple) -> None:
         self.database[key] = value
 
-    def delete(self, key):
+    def delete(self, key: int) -> None:
         if self.database.get(key):
             self.database.pop(key)
 
-    def keys(self):
+    def keys(self) -> list:
         return list(self.database.keys())
 
 
@@ -43,7 +85,7 @@ user_status = MessageInfo()
 
 
 class BotMessage:
-    def __init__(self, bot, message):
+    def __init__(self, bot: AsyncTeleBot, message: types.Message) -> None:
         self.bot = bot
         self.message = message
         self.is_staff = False
@@ -54,14 +96,14 @@ class BotMessage:
         self.type = ''
         self.data = {}
 
-    def is_staff_check(self):
+    def is_staff_check(self) -> None:
         user_data = self.get_api_answer('', 'get', 'v1/users/me')
         if user_data.status_code == HTTPStatus.OK:
             self.is_user = True
             if user_data.json().get('is_staff'):
                 self.is_staff = True
 
-    async def authorization(self):
+    async def authorization(self) -> None:
         if not user_status.get(self.message.chat.id):
             if not self.is_user:
                 self.status = LOGIN
@@ -82,7 +124,7 @@ class BotMessage:
             message: str,
             chat_id: int,
             buttons: List[str] = None
-    ):
+    ) -> None:
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         if buttons:
             keyboard.add(*buttons)
@@ -120,9 +162,15 @@ class BotMessage:
             if api_answer.status_code == HTTPStatus.BAD_REQUEST:
                 if len(api_answer.json()) > 1:
                     for error in list(api_answer.json()):
-                        self.data.pop(error.keys()[0])
+
+                        self.data.pop(error.keys())
                 else:
-                    self.data.pop(list(api_answer.json().keys())[0])
+                    bad_object = list(api_answer.json().keys())
+                    self.data.pop(bad_object[0])
+                user_status.set(
+                    self.message.chat.id,
+                    (self.status, self.type, self.data)
+                )
                 return (
                     ' '.join(*api_answer.json().values())
                 )
@@ -151,7 +199,11 @@ class BotMessage:
         except RequestException as error:
             logging.error(error, exc_info=True)
 
-    async def send_admin_user_apply_message(self, names, answer):
+    async def send_admin_user_apply_message(
+            self,
+            names: dict,
+            answer: Request
+    ):
         if (
                 names == USER_CREATE_NAMES
                 and answer.status_code == HTTPStatus.CREATED
@@ -164,7 +216,7 @@ class BotMessage:
                 [STAFF_ACCEPT, STAFF_DECLINE]
             )
 
-    def data_field_fill_in(self, question_num, names):
+    def data_field_fill_in(self, question_num: int, names: dict) -> None:
         if not question_num:
             if self.type == EDIT:
                 self.data['pk'] = self.get_equipment_pk_from_bot_message()
@@ -176,9 +228,7 @@ class BotMessage:
                     self.data[name] = self.message.text
                     break
 
-    async def data_collect(
-            self,
-    ) -> None:
+    async def data_collect(self) -> None:
         names = USER_CREATE_NAMES if self.status == LOGIN else (
             EQUIPMENT_CREATE_NAMES
         )
@@ -201,23 +251,24 @@ class BotMessage:
                     return
         url = "v1/users" if names == USER_CREATE_NAMES else "v1/equipments"
         method = 'post'
+        new_data = {}
         if self.type == EDIT:
             url += '/' + self.data.get('pk')
-            new_data = {}
             for key, value in self.data.items():
                 if value not in PASS_VALUES:
                     new_data[key] = value
-            self.data = new_data
             method = 'patch'
 
-        answer = self.get_api_answer('', method, url, self.data)
+        answer = self.get_api_answer('', method, url, new_data or self.data)
         await self.send_message(
-            self.text_formatter(await self.status_code_parser(answer))[0],
+            self.text_formatter(
+                await self.status_code_parser(answer)
+            )[0],
             self.message.chat.id,
             list(VARIANTS.keys())
         )
         await self.send_admin_user_apply_message(names, answer)
-        if answer.status_code() != HTTPStatus.BAD_REQUEST:
+        if answer.status_code != HTTPStatus.BAD_REQUEST:
             user_status.delete(self.message.chat.id)
         return
 
@@ -226,14 +277,14 @@ class BotMessage:
             'id: ')[-1].split(
             '\n')[0]
 
-    async def reply_to_message_message(self):
+    async def reply_to_message_message(self) -> None:
         if (
                 self.message.chat.id == ADMIN_ID
                 and SUCCESSFULLY_CREATED in self.message.reply_to_message.text
         ):
-            new_user_id = self.message.reply_to_message.text.split(
+            new_user_id = int(self.message.reply_to_message.text.split(
                 'и телеграм id '
-            )[-1].split('\n')[0]
+            )[-1].split('\n')[0])
             is_staff = True if self.message.text == STAFF_ACCEPT else False
             added_or_deleted = ADDED if is_staff else DELETED
             await self.send_message(
@@ -282,9 +333,9 @@ class BotMessage:
             )
         return await self.incorrect_command()
 
-    async def create_and_send_excel(self, equipments):
+    async def create_and_send_excel(self, equipments: list):
         dataframe = pandas.DataFrame(equipments)
-        now = datetime.datetime.now().strftime("%d_%m_%y_%H_%M")
+        now = datetime.datetime.now().strftime("%y_%d_%m_%H_%M")
         filepath = f'equipment_list_{now}.xlsx'
         dataframe.to_excel(
             filepath,
@@ -315,10 +366,9 @@ class BotMessage:
             )
 
         if self.type in EQUIPMENTS_FILTER_FIELDS.values():
-            action = self.type
             equipments_without_formatter = await self.status_code_parser(
                 self.get_api_answer(
-                    f'{action}={self.message.text}',
+                    f'{self.type}={self.message.text}',
                     'get',
                     'v1/equipments'
                 )
@@ -353,6 +403,8 @@ class BotMessage:
         return user_status.delete(self.message.chat.id)
 
     async def message_manager(self) -> None:
+        if self.message.text == '/start':
+            user_status.delete(self.message.chat.id)
         chat_information = user_status.get(self.message.chat.id)
         if hasattr(self.message.reply_to_message, 'text'):
             return await self.reply_to_message_message()
@@ -362,7 +414,7 @@ class BotMessage:
 
         self.chat_information = chat_information
         self.status, self.type, self.data = self.chat_information
-        if self.status in [LOGIN, EQUIPMENT_ADD]:
+        if self.status in [LOGIN, EQUIPMENT_ADD, EQUIPMENT_CHANGE]:
             return await self.data_collect()
         if self.status == EQUIPMENT_SEARCH:
             return await self.equipment_search()

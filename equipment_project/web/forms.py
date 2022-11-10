@@ -1,6 +1,14 @@
-from django import forms
-from equipments.models import (Attestation, Calibration, Document, Equipment,
-                               Movement, Rent)
+from django import (
+    forms,
+)
+from equipments.models import (
+    Attestation,
+    Calibration,
+    Document,
+    Equipment,
+    Movement,
+    Rent,
+)
 
 
 class RentForm(forms.ModelForm):

@@ -1,6 +1,8 @@
 import os
 
-from dotenv import load_dotenv
+from dotenv import (
+    load_dotenv,
+)
 
 load_dotenv()
 
@@ -154,7 +156,7 @@ EQUIPMENT_CREATE_NAMES = {
     'serial_number': 'серийный номер',
     'model': 'модель',
     'manufacturer': 'изготовителя',
-    'nomenclature_key': 'Код ТН ВЭД',
+    'nomenclature_key': 'Код ТН ВЭД (только цифры)',
     'document_path': 'Путь к папке с документацией'
 }
 USER_CREATE_NAMES = {

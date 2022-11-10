@@ -1,5 +1,7 @@
 import django_filters
-from equipments.models import Equipment
+from equipments.models import (
+    Equipment,
+)
 
 
 class EquipmentFilter(django_filters.FilterSet):

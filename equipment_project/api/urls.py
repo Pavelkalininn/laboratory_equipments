@@ -1,8 +1,18 @@
-from api.views import (AttestationViewSet, CalibrationViewSet,
-                       EquipmentViewSet, MovementViewSet, RentViewSet,
-                       UserViewSet)
-from django.urls import include, path
-from rest_framework import routers
+from api.views import (
+    AttestationViewSet,
+    CalibrationViewSet,
+    EquipmentViewSet,
+    MovementViewSet,
+    RentViewSet,
+    UserViewSet,
+)
+from django.urls import (
+    include,
+    path,
+)
+from rest_framework import (
+    routers,
+)
 
 router = routers.DefaultRouter()
 

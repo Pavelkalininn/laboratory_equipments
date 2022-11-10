@@ -3,8 +3,6 @@ name: CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   tests:
@@ -64,14 +62,14 @@ jobs:
         with:
           push: true
           context: equipment_project/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.5
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.51
 
       - name: Push bot to Docker Hub
         uses: docker/build-push-action@v2
         with:
           push: true
           context: bot/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:v1.0
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:v1.11
 
 #  deploy:
 #    runs-on: ubuntu-latest

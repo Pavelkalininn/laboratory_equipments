@@ -2,12 +2,27 @@ import asyncio
 import logging
 import sys
 
-from body import BotMessage
-from const import ADMIN_ID, INFO, TELEGRAM_TOKEN, WEB_HOST
-from exceptions import BotError
-from telebot import ExceptionHandler
-from telebot.async_telebot import AsyncTeleBot
-from telebot.types import Message
+from body import (
+    BotMessage,
+)
+from const import (
+    ADMIN_ID,
+    INFO,
+    TELEGRAM_TOKEN,
+    WEB_HOST,
+)
+from exceptions import (
+    BotError,
+)
+from telebot import (
+    ExceptionHandler,
+)
+from telebot.async_telebot import (
+    AsyncTeleBot,
+)
+from telebot.types import (
+    Message,
+)
 
 
 def check_tokens():
