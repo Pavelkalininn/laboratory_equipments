@@ -25,6 +25,14 @@ from telebot.types import (
 )
 
 
+class BotExceptionHandler(ExceptionHandler):
+    """
+    Class for handling exceptions while Polling
+    """
+    def handle(self, exception):
+        raise exception
+
+
 def check_tokens():
     """Проверка наличия переменных окружения."""
     return TELEGRAM_TOKEN and WEB_HOST and ADMIN_ID
@@ -48,9 +56,12 @@ def main():
             'Программа принудительно остановлена.'
             ' Отсутствуют переменные окружения.'
         )
+
+    handler = BotExceptionHandler
+
     bot = AsyncTeleBot(
         TELEGRAM_TOKEN,
-        exception_handler=ExceptionHandler()
+        exception_handler=handler()
     )
 
     async def text_manager(message: Message):

@@ -8,6 +8,7 @@ load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 WEB_HOST = os.getenv('WEB_HOST')
+REDIS_HOST = os.getenv('REDIS_HOST')
 ADMIN_ID = int(os.getenv('TELEGRAM_TO'))
 WEB_URL = os.getenv('WEB_URL')
 API_PORT = os.getenv('API_PORT')
@@ -38,6 +39,8 @@ EDIT = 'Изменить'
 WITHOUT_CHANGES = 'Без изменений'
 DASH = '-'
 PASS_VALUES = [DASH, WITHOUT_CHANGES]
+DATE_FORM = '%y_%d_%m_%H_%M'
+FILENAME = 'equipment_list_{date}.xlsx'
 EXCEL_HEADERS = [
     'id',
     'Инвентарный номер',
@@ -86,6 +89,7 @@ ACCESS_DENIED = 'Ошибка доступа, пользователь не на
 INCORRECT_STATUS = 'Некорректный статус от API {status}'
 
 AUTHORIZATION = 'Authorization'
+STATUS_REMOVE = 'Залезли в какие-то дебри, начнём сначала. Статус сбросили.'
 INFO = '''
 Бот для просмотра и внесения сведений по оборудованию
 
