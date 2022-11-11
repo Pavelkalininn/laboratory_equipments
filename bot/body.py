@@ -21,6 +21,7 @@ from const import (
     ADMIN_ID,
     API_PORT,
     AUTHORIZATION,
+    DATE_FORM,
     DELETED,
     EDIT,
     EQUIPMENT_ADD,
@@ -31,6 +32,7 @@ from const import (
     EQUIPMENTS,
     EQUIPMENTS_FILTER_FIELDS,
     EXCEL_HEADERS,
+    FILENAME,
     FILL_IN_VALUE,
     FIND_FIELD,
     INCORRECT_COMMAND,
@@ -40,6 +42,7 @@ from const import (
     PASS_VALUES,
     STAFF_ACCEPT,
     STAFF_DECLINE,
+    STATUS_REMOVE,
     SUCCESSFULLY_CREATED,
     TOO_MANY_RESULTS,
     UNAUTHORIZED,
@@ -56,30 +59,15 @@ from requests import (
 from rest_framework.request import (
     Request,
 )
+from sub import (
+    MessageInfo,
+)
 from telebot import (
     types,
 )
 from telebot.async_telebot import (
     AsyncTeleBot,
 )
-
-
-class MessageInfo:
-    database = {}
-
-    def get(self, key: int) -> tuple:
-        return self.database.get(key)
-
-    def set(self, key: int, value: tuple) -> None:
-        self.database[key] = value
-
-    def delete(self, key: int) -> None:
-        if self.database.get(key):
-            self.database.pop(key)
-
-    def keys(self) -> list:
-        return list(self.database.keys())
-
 
 user_status = MessageInfo()
 
@@ -98,13 +86,17 @@ class BotMessage:
 
     def is_staff_check(self) -> None:
         user_data = self.get_api_answer('', 'get', 'v1/users/me')
-        if user_data.status_code == HTTPStatus.OK:
+        if user_data.status_code in [HTTPStatus.OK, ]:
             self.is_user = True
             if user_data.json().get('is_staff'):
                 self.is_staff = True
 
     async def authorization(self) -> None:
-        if not user_status.get(self.message.chat.id):
+        chat_information = user_status.get(self.message.chat.id)
+        if chat_information:
+            self.chat_information = chat_information
+            self.status, self.type, self.data = self.chat_information
+        else:
             if not self.is_user:
                 self.status = LOGIN
                 new_status = (self.status, '', {})
@@ -157,13 +149,12 @@ class BotMessage:
                 HTTPStatus.CREATED,
             ]:
                 return api_answer.json()
-            if api_answer.status_code == HTTPStatus.FORBIDDEN:
+            if api_answer.status_code in [HTTPStatus.FORBIDDEN, ]:
                 return ACCESS_DENIED
-            if api_answer.status_code == HTTPStatus.BAD_REQUEST:
+            if api_answer.status_code in [HTTPStatus.BAD_REQUEST, ]:
                 if len(api_answer.json()) > 1:
-                    for error in list(api_answer.json()):
-
-                        self.data.pop(error.keys())
+                    for key, _ in api_answer.json().items():
+                        self.data.pop(key)
                 else:
                     bad_object = list(api_answer.json().keys())
                     self.data.pop(bad_object[0])
@@ -172,7 +163,7 @@ class BotMessage:
                     (self.status, self.type, self.data)
                 )
                 return (
-                    ' '.join(*api_answer.json().values())
+                    ' '.join(list(api_answer.json().values())[0])
                 )
             return (
                 str(api_answer.text)
@@ -205,8 +196,8 @@ class BotMessage:
             answer: Request
     ):
         if (
-                names == USER_CREATE_NAMES
-                and answer.status_code == HTTPStatus.CREATED
+                names in [USER_CREATE_NAMES, ]
+                and answer.status_code in [HTTPStatus.CREATED, ]
         ):
             await self.send_message(
                 self.text_formatter(
@@ -218,7 +209,7 @@ class BotMessage:
 
     def data_field_fill_in(self, question_num: int, names: dict) -> None:
         if not question_num:
-            if self.type == EDIT:
+            if self.type in [EDIT, ]:
                 self.data['pk'] = self.get_equipment_pk_from_bot_message()
             else:
                 self.data['telegram_id'] = self.message.chat.id
@@ -229,17 +220,17 @@ class BotMessage:
                     break
 
     async def data_collect(self) -> None:
-        names = USER_CREATE_NAMES if self.status == LOGIN else (
+        names = USER_CREATE_NAMES if self.status in [LOGIN, ] else (
             EQUIPMENT_CREATE_NAMES
         )
+
+        question_num = len(self.data)
+        self.data_field_fill_in(question_num, names)
+        buttons = (WITHOUT_CHANGES, ) if self.type in [EDIT, ] else None
         user_status.set(
             self.message.chat.id,
             (self.status, self.type, self.data)
         )
-        question_num = len(self.data)
-        self.data_field_fill_in(question_num, names)
-        buttons = (WITHOUT_CHANGES, ) if self.type == EDIT else None
-
         if question_num < len(names):
             for field, name in names.items():
                 if field not in self.data:
@@ -249,10 +240,10 @@ class BotMessage:
                         buttons
                     )
                     return
-        url = "v1/users" if names == USER_CREATE_NAMES else "v1/equipments"
+        url = "v1/users" if names in [USER_CREATE_NAMES, ] else "v1/equipments"
         method = 'post'
         new_data = {}
-        if self.type == EDIT:
+        if self.type in [EDIT, ]:
             url += '/' + self.data.get('pk')
             for key, value in self.data.items():
                 if value not in PASS_VALUES:
@@ -279,13 +270,13 @@ class BotMessage:
 
     async def reply_to_message_message(self) -> None:
         if (
-                self.message.chat.id == ADMIN_ID
+                self.message.chat.id in [ADMIN_ID, ]
                 and SUCCESSFULLY_CREATED in self.message.reply_to_message.text
         ):
             new_user_id = int(self.message.reply_to_message.text.split(
                 'и телеграм id '
             )[-1].split('\n')[0])
-            is_staff = True if self.message.text == STAFF_ACCEPT else False
+            is_staff = True if self.message.text in [STAFF_ACCEPT, ] else False
             added_or_deleted = ADDED if is_staff else DELETED
             await self.send_message(
                 USER_SUCCESSFULLY_ADD_OR_DELETE.format(
@@ -311,14 +302,14 @@ class BotMessage:
                 new_user_id,
                 list(VARIANTS.keys())
             )
-        if self.message.text == EQUIPMENT_CHANGE:
+        if self.message.text in [EQUIPMENT_CHANGE, ]:
             self.status = EQUIPMENT_CHANGE
             self.type = EDIT
             return await self.data_collect()
-        return await self.incorrect_command()
+        return await self.status_remove(INCORRECT_COMMAND)
 
     async def message_without_status(self):
-        if self.message.text == EQUIPMENT_ADD:
+        if self.message.text in [EQUIPMENT_ADD, ]:
             self.status = EQUIPMENT_ADD
             return await self.data_collect()
         if self.message.text in VARIANTS:
@@ -331,12 +322,12 @@ class BotMessage:
             return user_status.set(
                 self.message.chat.id, (self.message.text, '', {})
             )
-        return await self.incorrect_command()
+        return await self.status_remove(INCORRECT_COMMAND)
 
     async def create_and_send_excel(self, equipments: list):
         dataframe = pandas.DataFrame(equipments)
-        now = datetime.datetime.now().strftime("%y_%d_%m_%H_%M")
-        filepath = f'equipment_list_{now}.xlsx'
+        date = datetime.datetime.now().strftime(DATE_FORM)
+        filepath = FILENAME.format(date=date)
         dataframe.to_excel(
             filepath,
             index=False,
@@ -349,7 +340,7 @@ class BotMessage:
 
     async def equipment_search(self):
         if (
-                self.status == EQUIPMENT_SEARCH
+                self.status in [EQUIPMENT_SEARCH, ]
                 and self.message.text in EQUIPMENTS_FILTER_FIELDS
         ):
             await self.send_message(
@@ -392,30 +383,25 @@ class BotMessage:
                 await self.create_and_send_excel(equipments_without_formatter)
             self.status = ''
             return user_status.delete(self.message.chat.id)
-        return await self.incorrect_command()
+        return await self.status_remove(INCORRECT_COMMAND)
 
-    async def incorrect_command(self):
+    async def status_remove(self, message):
         await self.send_message(
-            INCORRECT_COMMAND,
+            message,
             self.message.chat.id,
             list(VARIANTS.keys())
         )
         return user_status.delete(self.message.chat.id)
 
     async def message_manager(self) -> None:
-        if self.message.text == '/start':
-            user_status.delete(self.message.chat.id)
-        chat_information = user_status.get(self.message.chat.id)
+        if self.message.text in ['/start', 'сброс', 'Сброс']:
+            return await self.status_remove(STATUS_REMOVE)
         if hasattr(self.message.reply_to_message, 'text'):
             return await self.reply_to_message_message()
-
-        if not chat_information:
+        if self.chat_information == ('', '', {}):
             return await self.message_without_status()
-
-        self.chat_information = chat_information
-        self.status, self.type, self.data = self.chat_information
         if self.status in [LOGIN, EQUIPMENT_ADD, EQUIPMENT_CHANGE]:
             return await self.data_collect()
-        if self.status == EQUIPMENT_SEARCH:
+        if self.status in [EQUIPMENT_SEARCH, ]:
             return await self.equipment_search()
-        return await self.incorrect_command()
+        return await self.status_remove(INCORRECT_COMMAND)
