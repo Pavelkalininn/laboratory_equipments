@@ -12,7 +12,7 @@ from typing import (
     Union,
 )
 
-import pandas
+from pandas import DataFrame
 import requests
 from const import (
     ACCESS_DENIED,
@@ -334,7 +334,7 @@ class BotMessage:
         return await self.status_remove(INCORRECT_COMMAND)
 
     async def create_and_send_excel(self, equipments: list):
-        dataframe = pandas.DataFrame(equipments)
+        dataframe = DataFrame(equipments)
         date = datetime.datetime.now().strftime(DATE_FORM)
         filepath = FILENAME.format(date=date)
         dataframe.to_excel(

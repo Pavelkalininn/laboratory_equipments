@@ -22,6 +22,7 @@ Django - web application for operational laboratory equipment information change
     psycopg2-binary==2.9.3
     pandas==1.3.5
     openpyxl==3.0.10
+    redis==4.3.4
 
 ## Env file template path: 
 
@@ -33,15 +34,17 @@ The DOCKER_USERNAME variable must be present in the Github secrets environment t
 
 ### It is necessary to execute the commands in the infra folder to launch a project, apply migrations, create a superuser, load static, respectively:
     
-    docker-compose up -d --build
-    docker-compose exec web python manage.py migrate
-    docker-compose exec web python ./manage.py loaddata test_fixtures.json
-    docker-compose exec web python manage.py createsuperuser
-    docker-compose exec web python manage.py collectstatic --no-input
+    docker-compose -f docker-compose_prod.yml up -d --build
+    docker-compose -f docker-compose_prod.yml exec web python manage.py migrate
+    docker-compose -f docker-compose_prod.yml exec web python manage.py loaddata test_fixtures.json
+    docker-compose -f docker-compose_prod.yml exec web python manage.py createsuperuser
+    docker-compose -f docker-compose_prod.yml exec web python manage.py collectstatic --no-input
+
+You need change docker-compose_prod.yml on docker-compose_develop.yml for running application in development mode with open ports and additional abilities
 
 You need to register on the main page, and then confirm the user's status as staff in the admin panel to work in the web application
 
-Run in the infra folder to stop the container:
+Run in the infra folder to stop and remove containers:
 
      docker-compose down -v
 
