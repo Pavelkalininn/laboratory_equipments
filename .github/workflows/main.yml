@@ -69,7 +69,7 @@ jobs:
         with:
           push: true
           context: bot/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:v1.12
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:v1.13
 
 #  deploy:
 #    runs-on: ubuntu-latest
