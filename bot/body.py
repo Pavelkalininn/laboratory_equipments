@@ -12,7 +12,6 @@ from typing import (
     Union,
 )
 
-from pandas import DataFrame
 import requests
 from const import (
     ACCESS_DENIED,
@@ -54,6 +53,9 @@ from const import (
     VARIANTS,
     WEB_HOST,
     WITHOUT_CHANGES,
+)
+from pandas import (
+    DataFrame,
 )
 from redis_storage import (
     MessageInfo,
