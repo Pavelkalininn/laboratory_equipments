@@ -36,7 +36,7 @@ services:
       - web
 
   bot:
-    image: ${DOCKER_USERNAME}/equipment_project_bot:v1.12
+    image: ${DOCKER_USERNAME}/equipment_project_bot:v1.13
     env_file:
       - ./.env
     depends_on:

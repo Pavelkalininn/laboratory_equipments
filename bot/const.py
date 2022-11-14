@@ -13,6 +13,8 @@ ADMIN_ID = int(os.getenv('TELEGRAM_TO'))
 WEB_URL = os.getenv('WEB_URL')
 API_PORT = os.getenv('API_PORT')
 MAX_COUNT = 10
+STATUS = 'status'
+STATUS_TYPE = 'status_type'
 
 TOO_MANY_RESULTS = f'''
 Слишком много результатов, будут показаны первые {MAX_COUNT},
