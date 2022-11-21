@@ -1,4 +1,4 @@
-# Laboratory equipment database with parameters and documentation on Django web UI and Telegram bot UI (beta).
+# Laboratory equipment database with parameters and documentation on Django web UI and Telegram bot UI.
 
 ![Workflow](https://github.com/Pavelkalininn/laboratory_equipments/actions/workflows/main.yml/badge.svg)
 
