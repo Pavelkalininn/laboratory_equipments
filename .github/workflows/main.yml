@@ -36,9 +36,9 @@ jobs:
         run: |
           python -m flake8
 
-#      - name: Test with unittests
-#        run: |
-#          cd equipment_project/ && python manage.py test
+      - name: Test with unittests
+        run: |
+          cd equipment_project/ && python manage.py test
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
@@ -62,7 +62,7 @@ jobs:
         with:
           push: true
           context: equipment_project/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.53
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.54
 
       - name: Push bot to Docker Hub
         uses: docker/build-push-action@v2
