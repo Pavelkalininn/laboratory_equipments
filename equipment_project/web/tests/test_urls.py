@@ -51,12 +51,8 @@ class EquipmentURLTests(TestCase):
             document_path=DOCUMENT_PATH_FIRST,
             creator=EquipmentURLTests.staff_user
         )
-        EquipmentURLTests.equipment.documents.set(
-            (EquipmentURLTests.document_manual,)
-        )
         cls.pages = (
             '/',
-            f'/equipment_get/{EquipmentURLTests.equipment.id}/',
             '/equipment_create/',
             f'/equipment_edit/{EquipmentURLTests.equipment.id}/',
             f'/movement_create/{EquipmentURLTests.equipment.id}/',
@@ -83,8 +79,6 @@ class EquipmentURLTests(TestCase):
         """Проверяем соответствие адреса и шаблона страницы."""
         page_dict = {
             '/':
-                'equipments/index.html',
-            f'/equipment_get/{self.equipment.id}/':
                 'equipments/index.html',
             '/equipment_create/':
                 'equipments/create_form.html',

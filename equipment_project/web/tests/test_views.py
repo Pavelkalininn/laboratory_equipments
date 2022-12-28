@@ -75,12 +75,9 @@ class EquipmentPagesTests(TestCase):
         )
         cls.pages = (
             '/',
-            f'/rent_create/{EquipmentPagesTests.equipment.id}/',
             f'/equipment_get/{EquipmentPagesTests.equipment.id}/',
             '/equipment_create/',
             f'/equipment_edit/{EquipmentPagesTests.equipment.id}/',
-            f'/attestation_create/{EquipmentPagesTests.equipment.id}/',
-            f'/calibration_create/{EquipmentPagesTests.equipment.id}/',
             f'/movement_create/{EquipmentPagesTests.equipment.id}/',
         )
         cls.movement_first = Movement.objects.create(
@@ -116,10 +113,7 @@ class EquipmentPagesTests(TestCase):
         """URL-адрес использует соответствующий шаблон."""
         page_dict = {
             reverse('web:index'): 'equipments/index.html',
-            reverse(
-                'web:equipment_get',
-                kwargs={'equipment_id': EquipmentPagesTests.equipment.id}
-            ): 'equipments/index.html',
+
             reverse(
                 'web:equipment_create'
             ): 'equipments/create_form.html',
@@ -155,8 +149,6 @@ class EquipmentPagesTests(TestCase):
         первый элемент которого - Equipment."""
         form_fields_list = [
             reverse('web:index'),
-            reverse('web:equipment_get',
-                    kwargs={'equipment_id': EquipmentPagesTests.equipment.id}),
         ]
         for value in form_fields_list:
             with self.subTest(value=value):
@@ -189,20 +181,6 @@ class EquipmentPagesTests(TestCase):
         ).all()
         self.assertEqual(
             tuple(equipments),
-            tuple(response.context.get('page_obj'))
-        )
-
-    def test_equipment_get_page_show_correct_context(self):
-        """Страница equipment_get сформирована с правильным контекстом."""
-        response = self.authorized_staff_user.get(
-            reverse(
-                'web:equipment_get',
-                kwargs={'equipment_id': EquipmentPagesTests.equipment.id}
-            )
-        )
-        equipment = Equipment.objects.get(id=EquipmentPagesTests.equipment.id)
-        self.assertEqual(
-            tuple([equipment, ]),
             tuple(response.context.get('page_obj'))
         )
 
@@ -272,16 +250,4 @@ class EquipmentPagesTests(TestCase):
         self.assertEqual(
             len(response.context.get('page_obj')),
             1,
-        )
-        self.assertEqual(
-            set(response.context.get('page_obj')[0].rents.all()),
-            set(EquipmentPagesTests.equipment.rents.all()),
-        )
-        self.assertEqual(
-            set(response.context.get('page_obj')[0].attestations.all()),
-            set(EquipmentPagesTests.equipment.attestations.all()),
-        )
-        self.assertEqual(
-            set(response.context.get('page_obj')[0].calibrations.all()),
-            set(EquipmentPagesTests.equipment.calibrations.all()),
         )
