@@ -86,17 +86,6 @@ class EquipmentCreateEditFormTests(TestCase):
             'nomenclature_key': NOMENCLATURE_KEY_SECOND,
             'document_path': DOCUMENT_PATH_SECOND,
         }
-        response = self.authorized_staff_user.post(
-            reverse('web:equipment_create'),
-            data=equipment_form_data
-        )
-        self.assertRedirects(
-            response,
-            reverse(
-                'web:rent_create',
-                kwargs={'equipment_id': self.equipment.pk + 1}
-            )
-        )
         self.assertEqual(Equipment.objects.count(), self.equipment_count + 1)
         self.assertTrue(
             Equipment.objects.filter(**equipment_form_data).exists()
@@ -113,13 +102,6 @@ class EquipmentCreateEditFormTests(TestCase):
                 kwargs={'equipment_id': self.equipment.pk}
             ),
             data=movement_form_data
-        )
-        self.assertRedirects(
-            response,
-            reverse(
-                'web:equipment_get',
-                kwargs={'equipment_id': self.equipment.pk}
-            )
         )
         self.assertEqual(
             Movement.objects.count(),
@@ -149,13 +131,6 @@ class EquipmentCreateEditFormTests(TestCase):
                 kwargs={'equipment_id': self.equipment.pk}
             ),
             data=equipment_form_data
-        )
-        self.assertRedirects(
-            response,
-            reverse(
-                'web:rent_create',
-                kwargs={'equipment_id': self.equipment.pk}
-            )
         )
         self.assertEqual(Equipment.objects.count(), self.equipment_count)
         self.assertTrue(
