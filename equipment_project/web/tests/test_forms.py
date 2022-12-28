@@ -86,6 +86,10 @@ class EquipmentCreateEditFormTests(TestCase):
             'nomenclature_key': NOMENCLATURE_KEY_SECOND,
             'document_path': DOCUMENT_PATH_SECOND,
         }
+        self.authorized_staff_user.post(
+            reverse('web:equipment_create'),
+            data=equipment_form_data
+        )
         self.assertEqual(Equipment.objects.count(), self.equipment_count + 1)
         self.assertTrue(
             Equipment.objects.filter(**equipment_form_data).exists()
@@ -96,7 +100,7 @@ class EquipmentCreateEditFormTests(TestCase):
             'date': DATE_MAY,
             'destination': self.destination_first.pk,
         }
-        response = self.authorized_staff_user.post(
+        self.authorized_staff_user.post(
             reverse(
                 'web:movement_create',
                 kwargs={'equipment_id': self.equipment.pk}
@@ -125,7 +129,7 @@ class EquipmentCreateEditFormTests(TestCase):
             'document_path': DOCUMENT_PATH_SECOND,
         }
 
-        response = self.authorized_staff_user.post(
+        self.authorized_staff_user.post(
             reverse(
                 'web:equipment_edit',
                 kwargs={'equipment_id': self.equipment.pk}
