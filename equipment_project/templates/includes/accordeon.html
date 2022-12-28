@@ -1,15 +1,5 @@
-{% ifequal table_object "rent" %}
-  <a href="{% url 'web:rent_create' char.id %}"> Добавить </a>
-{% endifequal %}
-{% ifequal table_object "attestation" %}
-  <a href="{% url 'web:attestation_create' char.id %}"> Добавить </a>
-{% endifequal %}
-{% ifequal table_object "calibration" %}
-  <a href="{% url 'web:calibration_create' char.id %}"> Добавить </a>
-{% endifequal %}
-{% ifequal table_object "movement" %}
-  <a href="{% url 'web:movement_create' char.id %}"> Добавить </a>
-{% endifequal %}
+<a href="{% url 'web:movement_create' char.id %}"> Передать оборудование </a>
+
 {% if values.all|length > 0 %}
   {% if values.all|length < 2 %}
     {% with values.first as value %}
@@ -18,19 +8,27 @@
   {% else %}
     <div class="accordion accordion-flush" id="accordion-group" style="font-size:14px;">
       <div class="accordion-item">
+        {% with values.first as value %}
+          {% if not value.destination.address %}
+            <font color="red">Адрес не указан</font>
+            <a href="{% url 'web:movement_update' value.id %}">Передать адрес использования</a><br>
+          {% endif %}
         <h2 class="accordion-header" id="headingOne">
           <button class="accordion-button collapsed" style="font-size:14px; padding:0px;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ table_object }}{{ char.id }}" aria-expanded="true" aria-controls="{{ table_object }}{{ char.id }}">
-            {% with values.first as value %}
-              {% include 'includes/cell_values.html' %}
-            {% endwith %}
+            {% include 'includes/cell_values.html' %}
           </button>
         </h2>
+        {% endwith %}
           <div id="{{ table_object }}{{ char.id }}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordion-group">
             {% if values.all|length > 1 %}
               {% for value in values.all %}
                 {% if forloop.first %}
                 {% else %}
                   <div class="accordion-body">
+                    {% if not value.destination.address %}
+                      <font color="red">Адрес не указан</font>
+                      <a href="{% url 'web:movement_update' value.id %}">Передать адрес использования</a><br>
+                    {% endif %}
                     {% include 'includes/cell_values.html' %}
                   </div>
                 {% endif %}

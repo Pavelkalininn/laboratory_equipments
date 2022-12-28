@@ -11,11 +11,8 @@
 
             {% if is_edit %}Редактировать {% else %}Добавить {% endif %}
             {% with request.resolver_match.view_name as view_name %}
-              {% if view_name  == 'web:rent_create' %}арендатора{% endif %}
               {% if view_name  == 'web:equipment_create' %}оборудование{% endif %}
               {% if view_name  == 'web:equipment_edit' %}оборудование{% endif %}
-              {% if view_name  == 'web:attestation_create' %}аттестацию{% endif %}
-              {% if view_name  == 'web:calibration_create' %}калибровку{% endif %}
               {% if view_name  == 'web:movement_create' %}местоположение{% endif %}
             {% endwith %}
           </div>

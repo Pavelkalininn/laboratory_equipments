@@ -27,35 +27,32 @@ ADMIN_ADD_OR_DELETE_YOU = '''
  Теперь доступны все функции.
 '''
 ADDED = 'добавлен'
+QUIT = 'Сброс'
 DELETED = 'удалён'
 USER_SUCCESSFULLY_ADD_OR_DELETE = 'Пользователь успешно {added_or_deleted}'
 SUCCESSFULLY_CREATED = 'Успешно создан!'
 EQUIPMENTS = 'Оборудование'
 LOGIN = 'регистрация'
 EQUIPMENT_ADD = 'Добавить оборудование'
+MOVEMENT_ADD = 'Передать оборудование'
 EQUIPMENT_SEARCH = 'Поиск оборудования'
 EQUIPMENT_CHANGE = 'Изменить оборудование'
 STAFF_ACCEPT = 'Подтвердить сотрудника'
 STAFF_DECLINE = 'Отменить статус сотрудника'
 EDIT = 'Изменить'
-WITHOUT_CHANGES = 'Без изменений'
+TODAY = 'Сегодня'
 DASH = '-'
-PASS_VALUES = [DASH, WITHOUT_CHANGES]
+PASS_VALUES = [DASH, TODAY]
 DATE_FORM = '%y_%d_%m_%H_%M'
 FILENAME = 'equipment_list_{date}.xlsx'
 EXCEL_HEADERS = [
     'id',
     'Инвентарный номер',
     'Наименование',
-    'Серийный номер',
     'Модель',
-    'Изготовитель',
     'Код ТН ВЭД',
-    'Документы',
+    'Руководство по эксплуатации',
     'Путь к папке с документами',
-    'Аренда',
-    'Аттестация',
-    'Калибровка',
     'Место нахождения',
     'Создатель'
 
@@ -65,24 +62,6 @@ EQUIPMENT_CHANGE_INFO = '''
 Для изменения оборудования необходимо сначала найти его, а затем в ответе на
  сообщение с его id нажать кнопку Изменить оборудование!'''
 
-VARIANTS = {
-    EQUIPMENT_SEARCH:
-        [
-            ['Наименование',
-             'Инвентарный номер',
-             'Модель',
-             'Серийный номер',
-             'Код ТН ВЭД ЕАЭС',
-             'Местонахождение'
-             ],
-            'По какому полю будем вести поиск?'
-        ],
-    EQUIPMENT_CHANGE:
-        [[], EQUIPMENT_CHANGE_INFO],
-    EQUIPMENT_ADD:
-        [[], 'Введите инвентарный номер']
-
-}
 INCORRECT_COMMAND = (
     'Введенная команда не используется, необходимо выбрать команду из '
     'предложенных вариантов'
@@ -97,15 +76,16 @@ INFO = '''
 
 '''
 BUTTON_START = ['/start']
+EQUIPMENT_ACTION_BUTTONS = (QUIT, MOVEMENT_ADD)
 ANY_THINK_WAS_WRONG = (
     'Что-то пошло не так, если ошибка повторится - обратитесь к администратору'
 )
 NO_ONE_OBJECT_FIND = 'Не найдено ни одного подходящего объекта'
+INPUT_VALUE = 'Введите значение'
 EQUIPMENTS_FILTER_FIELDS = {
     'Наименование': 'name',
     'Инвентарный номер': 'inventory',
     'Модель': 'model',
-    'Серийный номер': 'serial_number',
     'Код ТН ВЭД ЕАЭС': 'nomenclature_key',
     'Местонахождение': 'movement'
 }
@@ -137,33 +117,19 @@ EQUIPMENT_CONST = (
 Инвентарный номер: {inventory}
 
 Наименование: {name}
-Серийный номер: {serial_number}
 Модель: {model}
-Изготовитель: {manufacturer}
 Код ТН ВЭД: {nomenclature_key}
-Документы: {documents}
 Путь к папке с документами: {document_path}
-
-Аренда: {rents}
-
-Аттестаты: {attestations}
-
-Калибровки: {calibrations}
-
 Местоположения: {movements}
 
 Последнее изменение пользователем: {creator}
 '''
 )
 
-EQUIPMENT_CREATE_NAMES = {
-    'inventory': 'инвентарный номер',
-    'name': 'наименование',
-    'serial_number': 'серийный номер',
-    'model': 'модель',
-    'manufacturer': 'изготовителя',
-    'nomenclature_key': 'Код ТН ВЭД (только цифры)',
-    'document_path': 'Путь к папке с документацией'
+MOVEMENT_CREATE_NAMES = {
+    'date': 'Дата (если не текущей)',
+    'recipient': 'Фамилия получателя',
+    'destination': 'Место назначения'
 }
 USER_CREATE_NAMES = {
     'email': 'электронную почту',

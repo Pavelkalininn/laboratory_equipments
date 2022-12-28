@@ -1,3 +1,8 @@
+import datetime
+from http import (
+    HTTPStatus,
+)
+
 from api.authentication import (
     BotAuthentication,
 )
@@ -9,33 +14,29 @@ from api.permissions import (
     IsSuperUser,
 )
 from api.serializers import (
-    AttestationSerializer,
-    CalibrationSerializer,
     DestinationSerializer,
     DjoserUserCreateSerializer,
     DjoserUserUpdateSerializer,
-    DocumentSerializer,
     EquipmentSerializer,
     MovementCreateSerializer,
     MovementSerializer,
-    OrganizationSerializer,
-    RentSerializer,
 )
 from django.contrib.auth import (
     get_user_model,
+)
+from django.http import (
+    FileResponse,
+)
+from django.shortcuts import (
+    get_object_or_404,
 )
 from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from equipments.models import (
-    Attestation,
-    Calibration,
     Destination,
-    Document,
     Equipment,
     Movement,
-    Organization,
-    Rent,
 )
 from rest_framework import (
     status,
@@ -63,27 +64,15 @@ from rest_framework.viewsets import (
     GenericViewSet,
 )
 
+from equipment_project.settings import (
+    MEDIA_ROOT,
+)
+
 User = get_user_model()
-
-
-class CalibrationViewSet(viewsets.ModelViewSet):
-    queryset = Calibration.objects.all()
-    serializer_class = CalibrationSerializer
-    filter_backends = (DjangoFilterBackend,)
-    pagination_class = None
-    permission_classes = [IsStaff, ]
-    authentication_classes = [BotAuthentication, ]
-    filterset_fields = ('equipment', 'name')
-
-    def perform_create(self, serializer):
-        serializer.save(
-            creator=self.request.user
-        )
 
 
 class MovementViewSet(viewsets.ModelViewSet):
     queryset = Movement.objects.all()
-    serializer_class = MovementSerializer
     filter_backends = (DjangoFilterBackend,)
     pagination_class = None
     permission_classes = [IsStaff, ]
@@ -96,38 +85,38 @@ class MovementViewSet(viewsets.ModelViewSet):
         return MovementCreateSerializer
 
     def perform_create(self, serializer):
+        data = self.request.data
+        destination_address = data.get('destination')
+        if not Destination.objects.filter(
+                address=destination_address
+        ).exists():
+            destination = Destination.objects.create(
+                address=destination_address
+            )
+        else:
+            destination = get_object_or_404(
+                Destination,
+                address=destination_address
+            )
+        equipment = data.get('equipment')
+        recipient_last_name = data.get('recipient')
+
+        today = datetime.date.today()
+        current_date = datetime.datetime.strptime(
+            data.get('date'),
+            '%d.%m.%Y'
+        ).date()
+        date = current_date if current_date else today
+        early = current_date < today if current_date else False
+        late = current_date > today if current_date else False
         serializer.save(
-            creator=self.request.user
-        )
-
-
-class AttestationViewSet(viewsets.ModelViewSet):
-    queryset = Attestation.objects.all()
-    serializer_class = AttestationSerializer
-    filter_backends = (DjangoFilterBackend,)
-    pagination_class = None
-    permission_classes = [IsStaff, ]
-    authentication_classes = [BotAuthentication, ]
-    filterset_fields = ('equipment', 'name')
-
-    def perform_create(self, serializer):
-        serializer.save(
-            creator=self.request.user
-        )
-
-
-class RentViewSet(viewsets.ModelViewSet):
-    queryset = Rent.objects.all()
-    serializer_class = RentSerializer
-    filter_backends = (DjangoFilterBackend,)
-    pagination_class = None
-    permission_classes = [IsStaff, ]
-    authentication_classes = [BotAuthentication, ]
-    filterset_fields = ('equipment', 'renter', 'owner')
-
-    def perform_create(self, serializer):
-        serializer.save(
-            creator=self.request.user
+            creator=self.request.user,
+            destination=destination,
+            date=date,
+            early=early,
+            late=late,
+            equipment=get_object_or_404(Equipment, pk=equipment),
+            recipient=get_object_or_404(User, last_name=recipient_last_name)
         )
 
 
@@ -143,7 +132,6 @@ class EquipmentViewSet(viewsets.ModelViewSet):
         'name',
         'inventory',
         'model',
-        'serial_number',
         'nomenclature_key',
         'movement'
     )
@@ -158,19 +146,18 @@ class EquipmentViewSet(viewsets.ModelViewSet):
             creator=self.request.user
         )
 
-
-class OrganizationViewSet(viewsets.ModelViewSet):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
-    filter_backends = (DjangoFilterBackend,)
-    pagination_class = None
-    permission_classes = [IsStaff, ]
-    authentication_classes = [BotAuthentication, ]
-    filterset_fields = ('name',)
-
-    def perform_create(self, serializer):
-        serializer.save(
-            creator=self.request.user
+    @action(methods=['get'],
+            detail=True,
+            permission_classes=[IsStaff, ],
+            )
+    def manual_download(self, request, pk):
+        manual = get_object_or_404(Equipment, pk=pk).manual
+        filename = str(manual).split('/')[-1]
+        return FileResponse(
+            open(f'{MEDIA_ROOT}/{manual}', 'rb'),
+            status=HTTPStatus.OK,
+            as_attachment=True,
+            filename=filename
         )
 
 
@@ -189,27 +176,12 @@ class DestinationViewSet(viewsets.ModelViewSet):
         )
 
 
-class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all()
-    serializer_class = DocumentSerializer
-    filter_backends = (DjangoFilterBackend,)
-    pagination_class = None
-    permission_classes = [IsStaff, ]
-    authentication_classes = [BotAuthentication, ]
-    filterset_fields = ('name',)
-
-    def perform_create(self, serializer):
-        serializer.save(
-            creator=self.request.user
-        )
-
-
 class UserViewSet(GenericViewSet, UpdateModelMixin, CreateModelMixin):
     queryset = User.objects.all()
     authentication_classes = (BotAuthentication,)
 
     def get_serializer_class(self):
-        if self.request.method in ['PATCH', 'PUT']:
+        if self.request.method in ('PATCH', 'PUT'):
             return DjoserUserUpdateSerializer
         return DjoserUserCreateSerializer
 
@@ -221,7 +193,8 @@ class UserViewSet(GenericViewSet, UpdateModelMixin, CreateModelMixin):
     @action(methods=['patch'], detail=False)
     def staff_change(self, request):
         if request.method == 'PATCH':
-            new_user = User.objects.get(
+            new_user = get_object_or_404(
+                User,
                 telegram_id=request.data.get("new_user_id")
             )
             is_staff = request.data.get('is_staff')
@@ -240,14 +213,13 @@ class UserViewSet(GenericViewSet, UpdateModelMixin, CreateModelMixin):
 
     @action(methods=['get', 'patch', 'put', 'delete'], detail=False)
     def me(self, request):
+        user = request.user
         if request.method == 'GET':
-            user = User.objects.get(username=request.user.username)
             serializer = self.get_serializer(user)
             return Response(serializer.data)
 
         if request.method == 'PATCH' or request.method == 'PUT':
             partial = True if request.method == 'PATCH' else False
-            user = User.objects.get(username=request.user.username)
             data = request.data.copy()
             serializer = self.get_serializer(
                 user,

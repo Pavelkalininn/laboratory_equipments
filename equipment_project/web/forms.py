@@ -1,62 +1,59 @@
 from django import (
     forms,
 )
+from django.core.exceptions import (
+    ValidationError,
+)
+from django.db.models import (
+    Q,
+)
 from equipments.models import (
-    Attestation,
-    Calibration,
-    Document,
     Equipment,
     Movement,
-    Rent,
 )
 
 
-class RentForm(forms.ModelForm):
-
-    class Meta:
-        model = Rent
-        fields = ('owner', 'renter', 'date')
-
-
 class EquipmentForm(forms.ModelForm):
-
     class Meta:
         model = Equipment
         fields = (
             'inventory',
             'name',
-            'serial_number',
             'model',
-            'manufacturer',
             'nomenclature_key',
-            'documents',
+            'manual',
             'document_path',
         )
 
 
-class AttestationForm(forms.ModelForm):
+class MovementCreateForm(forms.ModelForm):
+    date = forms.DateField(
+        required=False
+    )
 
-    class Meta:
-        model = Attestation
-        fields = ('name', 'validity_period', 'date')
-
-
-class CalibrationForm(forms.ModelForm):
-
-    class Meta:
-        model = Calibration
-        fields = ('name', 'validity_period', 'date')
-
-
-class MovementForm(forms.ModelForm):
+    def validate(self, obj):
+        super().validate(obj)
+        request = self.context.get('request')
+        if Equipment.objects.filter(
+                (Q(pk__in=request.GET.getlist('ids')) | Q(
+                    pk=request.kwargs.get('equipment_id'))),
+                movements__destination=None
+        ).exists():
+            raise ValidationError(
+                'Invalid value: %(value)s',
+                code='invalid',
+                params={'value': '42'},
+            )
 
     class Meta:
         model = Movement
-        fields = ('destination', 'date')
+        fields = (
+            'date',
+            'recipient',
+        )
 
 
-class DocumentForm(forms.ModelForm):
-
+class MovementUpdateForm(forms.ModelForm):
     class Meta:
-        model = Document
-        fields = ('name', )
+        model = Movement
+        fields = ('destination',)

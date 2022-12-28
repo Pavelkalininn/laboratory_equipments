@@ -14,7 +14,7 @@ class MessageInfo:
 
     def delete(self, user_id: int) -> None:
         user_id = str(user_id)
-        headers = self.storage.hkeys(user_id)
+        headers = self.storage.hkeys(str(user_id))
         if headers:
             self.storage.hdel(user_id, *list(headers))
 
@@ -45,13 +45,16 @@ class MessageInfo:
         value = self.storage.hget(str(user_id), key)
         return value.decode() if value else None
 
-    def get_data(self, user_id: int) -> dict:
-        result = {
+    def get_user_info(self, user_id: int) -> dict:
+        return {
             key.decode(): value.decode()
             for key, value in self.storage.hgetall(
                 str(user_id)
             ).items()
         }
+
+    def get_data(self, user_id: int) -> dict:
+        result = self.get_user_info(user_id)
         if result:
             if STATUS in result:
                 result.pop('status')

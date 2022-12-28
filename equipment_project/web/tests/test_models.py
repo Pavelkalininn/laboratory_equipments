@@ -30,7 +30,6 @@ from web.tests.const import (
     EQUIPMENT_SERIAL_NUMBER_FIRST,
     FIRST_ORGANIZATION_NAME,
     INVENTORY_NUM_FIRST,
-    MANUFACTURER_FIRST,
     NOMENCLATURE_KEY_FIRST,
     SECOND_ORGANIZATION_NAME,
     USER_NAME_STAFF,
@@ -72,7 +71,6 @@ class EquipmentModelTest(TestCase):
             name=EQUIPMENT_NAME_FIRST,
             serial_number=EQUIPMENT_SERIAL_NUMBER_FIRST,
             model=EQUIPMENT_MODEL_FIRST,
-            manufacturer=MANUFACTURER_FIRST,
             nomenclature_key=NOMENCLATURE_KEY_FIRST,
             document_path=DOCUMENT_PATH_FIRST,
             creator=self.staff_user

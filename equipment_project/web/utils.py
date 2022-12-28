@@ -1,7 +1,11 @@
+import datetime
 from typing import (
-    Union,
+    List,
 )
 
+from django.contrib.auth import (
+    get_user_model,
+)
 from django.core.paginator import (
     Paginator,
 )
@@ -11,6 +15,7 @@ from django.shortcuts import (
 )
 from equipments.models import (
     Equipment,
+    Movement,
 )
 from web.const import (
     COUNT_OF_EQUIPMENT,
@@ -18,16 +23,15 @@ from web.const import (
     SIMPLE_FILTERED_FIELDS,
 )
 from web.forms import (
-    AttestationForm,
-    CalibrationForm,
     EquipmentForm,
-    MovementForm,
-    RentForm,
+    MovementCreateForm,
 )
 
+User = get_user_model()
 
-def pagination(posts, request):
-    paginator = Paginator(posts, COUNT_OF_EQUIPMENT)
+
+def pagination(equipments, request):
+    paginator = Paginator(equipments, COUNT_OF_EQUIPMENT)
     page_number = request.GET.get('page')
     return paginator.get_page(page_number)
 
@@ -55,28 +59,36 @@ def table_filters(request, equipments):
                    value: filter_parameter
                    }
             )
-    return equipments
+    return equipments.distinct()
 
 
 def valid_form_saver(form: EquipmentForm, request):
     new_form = form.save(commit=False)
     new_form.creator = request.user
     equipment = form.save()
-    if 'create_and_exit' in request.POST:
-        return redirect('web:equipment_get', equipment.pk)
-    return redirect('web:rent_create', equipment.pk)
+    return redirect('web:movement_create', equipment.pk)
 
 
 def valid_equipment_additional_parameter_saver(
-        form: Union[RentForm, AttestationForm, CalibrationForm, MovementForm],
-        equipment_id: int,
+        form: MovementCreateForm,
+        equipment_ids: List[int],
         request,
         next_redirect_url: str = None
 ):
-    new_form = form.save(commit=False)
-    new_form.equipment = get_object_or_404(Equipment, pk=equipment_id)
-    new_form.creator = request.user
-    new_form.save()
-    if not next_redirect_url or 'create_and_exit' in request.POST:
-        return redirect('web:equipment_get', equipment_id)
-    return redirect(next_redirect_url, equipment_id)
+    today = datetime.date.today()
+    data = form.cleaned_data
+    current_date = data.get('date')
+    data['date'] = current_date if current_date else today
+    data['early'] = current_date < today if current_date else False
+    data['late'] = current_date > today if current_date else False
+    movements = []
+    for current_id in equipment_ids:
+        movements.append(
+            Movement(
+                **data,
+                equipment=get_object_or_404(Equipment, pk=current_id),
+                creator=request.user
+            )
+        )
+    Movement.objects.bulk_create(movements)
+    return redirect('web:index')

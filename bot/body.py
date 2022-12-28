@@ -22,11 +22,8 @@ from const import (
     AUTHORIZATION,
     DATE_FORM,
     DELETED,
-    EDIT,
-    EQUIPMENT_ADD,
-    EQUIPMENT_CHANGE,
+    EQUIPMENT_ACTION_BUTTONS,
     EQUIPMENT_CONST,
-    EQUIPMENT_CREATE_NAMES,
     EQUIPMENT_SEARCH,
     EQUIPMENTS,
     EQUIPMENTS_FILTER_FIELDS,
@@ -37,22 +34,23 @@ from const import (
     INCORRECT_COMMAND,
     LOGIN,
     MAX_COUNT,
+    MOVEMENT_ADD,
+    MOVEMENT_CREATE_NAMES,
     NO_ONE_OBJECT_FIND,
-    PASS_VALUES,
+    QUIT,
     STAFF_ACCEPT,
     STAFF_DECLINE,
     STATUS,
     STATUS_REMOVE,
     STATUS_TYPE,
     SUCCESSFULLY_CREATED,
+    TODAY,
     TOO_MANY_RESULTS,
     UNAUTHORIZED,
     USER_CREATE_NAMES,
     USER_FORM,
     USER_SUCCESSFULLY_ADD_OR_DELETE,
-    VARIANTS,
     WEB_HOST,
-    WITHOUT_CHANGES,
 )
 from pandas import (
     DataFrame,
@@ -87,7 +85,7 @@ class BotMessage:
 
     def is_staff_check(self) -> None:
         user_data = self.get_api_answer('', 'get', 'v1/users/me')
-        if user_data.status_code in [HTTPStatus.OK, ]:
+        if user_data and user_data.status_code in (HTTPStatus.OK,):
             self.is_user = True
             if user_data.json().get('is_staff'):
                 self.is_staff = True
@@ -125,11 +123,15 @@ class BotMessage:
         if isinstance(data, str) or isinstance(data, dict):
             if 'email' in data and 'first_name' in data:
                 return [USER_FORM.format(**data)]
-            if 'inventory' in data and 'serial_number' in data:
+            if 'inventory' in data and 'manual' in data:
                 return [EQUIPMENT_CONST.format(**data)]
             return [data]
-        for equipment in data:
-            result.append(EQUIPMENT_CONST.format(**equipment))
+        if isinstance(data, list):
+            for value in data:
+                if 'address' in value:
+                    result.append(value.get('address'))
+                else:
+                    result.append(EQUIPMENT_CONST.format(**value))
         return result
 
     async def status_code_parser(
@@ -137,14 +139,14 @@ class BotMessage:
             api_answer: Request
     ) -> Union[list, str]:
         try:
-            if api_answer.status_code in [
-                HTTPStatus.OK,
-                HTTPStatus.CREATED,
-            ]:
+            if api_answer.status_code in (
+                    HTTPStatus.OK,
+                    HTTPStatus.CREATED,
+            ):
                 return api_answer.json()
-            if api_answer.status_code in [HTTPStatus.FORBIDDEN, ]:
+            if api_answer.status_code in (HTTPStatus.FORBIDDEN,):
                 return ACCESS_DENIED
-            if api_answer.status_code in [HTTPStatus.BAD_REQUEST, ]:
+            if api_answer.status_code in (HTTPStatus.BAD_REQUEST,):
                 if len(api_answer.json()) > 1:
                     user_status.remove_data_value(
                         self.id,
@@ -157,7 +159,9 @@ class BotMessage:
                         bad_object
                     )
                 return (
-                    ' '.join(list(api_answer.json().values())[0])
+                    ' '.join(
+                        f'{key} {" ".join(value)}'
+                        for key, value in api_answer.json().items())
                 )
             return (
                 str(api_answer.text)
@@ -192,8 +196,8 @@ class BotMessage:
             answer: Request
     ):
         if (
-                names in [USER_CREATE_NAMES, ]
-                and answer.status_code in [HTTPStatus.CREATED, ]
+                names in (USER_CREATE_NAMES,)
+                and answer.status_code in (HTTPStatus.CREATED,)
         ):
             await self.send_message(
                 self.text_formatter(
@@ -205,10 +209,10 @@ class BotMessage:
 
     def data_field_fill_in(self, question_num: int, names: dict) -> None:
         if not question_num:
-            if user_status.get_status_type(self.id) in [EDIT, ]:
+            if user_status.get_status(self.id) in (MOVEMENT_ADD,):
                 user_status.set_item(
                     self.id,
-                    'pk',
+                    'equipment',
                     self.get_equipment_pk_from_bot_message()
                 )
             else:
@@ -220,8 +224,8 @@ class BotMessage:
         else:
             for name in names:
                 if not user_status.get_data_value(
-                    self.id,
-                    name
+                        self.id,
+                        name
                 ):
                     user_status.set_item(
                         self.id,
@@ -233,15 +237,27 @@ class BotMessage:
     async def data_collect(self) -> None:
         names = USER_CREATE_NAMES if user_status.get_status(
             self.id
-        ) in [LOGIN, ] else (
-            EQUIPMENT_CREATE_NAMES
+        ) in (LOGIN,) else (
+            MOVEMENT_CREATE_NAMES
         )
 
         question_num = len(user_status.get_data(self.id))
         self.data_field_fill_in(question_num, names)
-        buttons = (WITHOUT_CHANGES, ) if user_status.get_status_type(
-            self.id
-        ) in [EDIT, ] else None
+        buttons = [QUIT, ]
+        data = user_status.get_data(self.id)
+        if user_status.get_status(self.id) in (MOVEMENT_ADD,):
+            if len(data) == 1:
+                buttons.append(TODAY)
+            if len(data) > 2:
+                answer = self.text_formatter(
+                    await self.status_code_parser(
+                        self.get_api_answer(
+                            '', 'get', 'v1/destinations', {}
+                        )
+                    )
+                )
+                buttons += answer
+
         if question_num < len(names):
             for field, name in names.items():
                 if not user_status.get_data_value(self.id, field):
@@ -251,25 +267,17 @@ class BotMessage:
                         buttons
                     )
                     return
-        url = "v1/users" if names in [USER_CREATE_NAMES, ] else "v1/equipments"
+        url = "v1/users" if names in (USER_CREATE_NAMES,) else "v1/movements"
         method = 'post'
-        new_data = {}
-        if user_status.get_status_type(self.id) in [EDIT, ]:
-            url += '/' + user_status.get_data_value(self.id, 'pk')
-            for key, value in user_status.get_data(self.id).items():
-                if value not in PASS_VALUES:
-                    new_data[key] = value
-            method = 'patch'
-
         answer = self.get_api_answer(
-            '', method, url, new_data or user_status.get_data(self.id)
+            '', method, url, user_status.get_data(self.id)
         )
         await self.send_message(
             self.text_formatter(
                 await self.status_code_parser(answer)
             )[0],
             self.id,
-            list(VARIANTS.keys())
+            EQUIPMENT_ACTION_BUTTONS
         )
         await self.send_admin_user_apply_message(names, answer)
         if answer.status_code != HTTPStatus.BAD_REQUEST:
@@ -283,13 +291,13 @@ class BotMessage:
 
     async def reply_to_message_message(self) -> None:
         if (
-                self.message.chat.id in [ADMIN_ID, ]
+                self.message.chat.id in (ADMIN_ID,)
                 and SUCCESSFULLY_CREATED in self.message.reply_to_message.text
         ):
             new_user_id = int(self.message.reply_to_message.text.split(
                 'и телеграм id '
             )[-1].split('\n')[0])
-            is_staff = True if self.message.text in [STAFF_ACCEPT, ] else False
+            is_staff = True if self.message.text in (STAFF_ACCEPT,) else False
             added_or_deleted = ADDED if is_staff else DELETED
             await self.send_message(
                 USER_SUCCESSFULLY_ADD_OR_DELETE.format(
@@ -313,26 +321,17 @@ class BotMessage:
                     added_or_deleted=added_or_deleted
                 ),
                 new_user_id,
-                list(VARIANTS.keys())
+                EQUIPMENT_ACTION_BUTTONS
             )
-        if self.message.text in [EQUIPMENT_CHANGE, ]:
-            user_status.set_status(self.id, EQUIPMENT_CHANGE)
-            user_status.set_status_type(self.id, EDIT)
+
+        if self.message.text in (MOVEMENT_ADD,):
+            user_status.set_status(self.id, self.message.text)
             return await self.data_collect()
         return await self.status_remove(INCORRECT_COMMAND)
 
     async def message_without_status(self):
-        if self.message.text in [EQUIPMENT_ADD, ]:
-            user_status.set_status(self.id, EQUIPMENT_ADD)
-            return await self.data_collect()
-        if self.message.text in VARIANTS:
-            buttons, answer = VARIANTS.get(self.message.text)
-            await self.send_message(
-                answer,
-                self.id,
-                buttons
-            )
-            return user_status.set_status(self.id, self.message.text)
+        if self.message.text in EQUIPMENTS_FILTER_FIELDS:
+            return await self.equipment_search()
         return await self.status_remove(INCORRECT_COMMAND)
 
     async def create_and_send_excel(self, equipments: list):
@@ -350,10 +349,7 @@ class BotMessage:
         os.remove(filepath)
 
     async def equipment_search(self):
-        if (
-                user_status.get_status(self.id) in [EQUIPMENT_SEARCH, ]
-                and self.message.text in EQUIPMENTS_FILTER_FIELDS
-        ):
+        if self.message.text in EQUIPMENTS_FILTER_FIELDS:
             await self.send_message(
                 FIND_FIELD.format(field=self.message.text),
                 self.message.chat.id
@@ -370,9 +366,10 @@ class BotMessage:
             self.id
         )
         if status_type in EQUIPMENTS_FILTER_FIELDS.values():
+            url = f'{status_type}={self.message.text}'
             equipments_without_formatter = await self.status_code_parser(
                 self.get_api_answer(
-                    f'{status_type}={self.message.text}',
+                    url,
                     'get',
                     'v1/equipments'
                 )
@@ -390,7 +387,7 @@ class BotMessage:
                 await self.send_message(
                     equipment,
                     self.message.chat.id,
-                    list(VARIANTS.keys())
+                    EQUIPMENT_ACTION_BUTTONS
                 )
             if len(equipments) > MAX_COUNT:
                 await self.create_and_send_excel(equipments_without_formatter)
@@ -401,28 +398,20 @@ class BotMessage:
         await self.send_message(
             message,
             self.message.chat.id,
-            list(VARIANTS.keys())
+            list(EQUIPMENTS_FILTER_FIELDS.keys())
         )
         return user_status.delete(self.message.chat.id)
 
     async def message_manager(self) -> None:
-        if self.message.text in ['/start', 'сброс', 'Сброс']:
+        if self.message.text in ('/start', QUIT.lower(), QUIT):
             return await self.status_remove(STATUS_REMOVE)
         if hasattr(self.message.reply_to_message, 'text'):
             return await self.reply_to_message_message()
         status = user_status.get_status(self.id)
-        if (
-                status
-                == user_status.get_status_type(self.id)
-                == ''
-                or (
-                    not status
-                    and not user_status.get_status_type(self.id)
-                )
-        ):
+        if not status:
             return await self.message_without_status()
-        if status in [LOGIN, EQUIPMENT_ADD, EQUIPMENT_CHANGE]:
+        if status in (LOGIN, MOVEMENT_ADD):
             return await self.data_collect()
-        if status in [EQUIPMENT_SEARCH, ]:
+        if status in (EQUIPMENT_SEARCH,):
             return await self.equipment_search()
         return await self.status_remove(INCORRECT_COMMAND)

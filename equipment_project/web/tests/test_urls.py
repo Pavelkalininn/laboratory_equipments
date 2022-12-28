@@ -10,17 +10,13 @@ from django.test import (
     TestCase,
 )
 from equipments.models import (
-    Document,
     Equipment,
 )
 from web.tests.const import (
-    DOCUMENT_MANUAL_NAME,
     DOCUMENT_PATH_FIRST,
     EQUIPMENT_MODEL_FIRST,
     EQUIPMENT_NAME_FIRST,
-    EQUIPMENT_SERIAL_NUMBER_FIRST,
     INVENTORY_NUM_FIRST,
-    MANUFACTURER_FIRST,
     NOMENCLATURE_KEY_FIRST,
     USER_NAME_NON_STAFF,
     USER_NAME_STAFF,
@@ -47,15 +43,10 @@ class EquipmentURLTests(TestCase):
             last_name='non_staff_last_name',
             is_staff=False
         )
-        cls.document_manual = Document.objects.create(
-            name=DOCUMENT_MANUAL_NAME
-        )
         cls.equipment = Equipment.objects.create(
             inventory=INVENTORY_NUM_FIRST,
             name=EQUIPMENT_NAME_FIRST,
-            serial_number=EQUIPMENT_SERIAL_NUMBER_FIRST,
             model=EQUIPMENT_MODEL_FIRST,
-            manufacturer=MANUFACTURER_FIRST,
             nomenclature_key=NOMENCLATURE_KEY_FIRST,
             document_path=DOCUMENT_PATH_FIRST,
             creator=EquipmentURLTests.staff_user
@@ -65,12 +56,9 @@ class EquipmentURLTests(TestCase):
         )
         cls.pages = (
             '/',
-            f'/rent_create/{EquipmentURLTests.equipment.id}/',
             f'/equipment_get/{EquipmentURLTests.equipment.id}/',
             '/equipment_create/',
             f'/equipment_edit/{EquipmentURLTests.equipment.id}/',
-            f'/attestation_create/{EquipmentURLTests.equipment.id}/',
-            f'/calibration_create/{EquipmentURLTests.equipment.id}/',
             f'/movement_create/{EquipmentURLTests.equipment.id}/',
         )
 
@@ -96,17 +84,11 @@ class EquipmentURLTests(TestCase):
         page_dict = {
             '/':
                 'equipments/index.html',
-            f'/rent_create/{self.equipment.id}/':
-                'equipments/create_form.html',
             f'/equipment_get/{self.equipment.id}/':
                 'equipments/index.html',
             '/equipment_create/':
                 'equipments/create_form.html',
             f'/equipment_edit/{self.equipment.id}/':
-                'equipments/create_form.html',
-            f'/attestation_create/{self.equipment.id}/':
-                'equipments/create_form.html',
-            f'/calibration_create/{self.equipment.id}/':
                 'equipments/create_form.html',
             f'/movement_create/{self.equipment.id}/':
                 'equipments/create_form.html',

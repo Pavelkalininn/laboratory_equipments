@@ -1,10 +1,10 @@
 <table class="table table-sm" style="font-size:14px;">
-  <form action="{% url 'web:index' %}" method="get">
+  <form action="{% url request.resolver_match.view_name %}" method="get">
+    <input size=5 type="submit" value="Поиск/сброс" />
     <thead class="table-light">
       <tr>
         <td>
-          <input size=5 type="submit" value="Поиск/сброс" />
-          <p>id</p>
+          <p>id, выбор</p>
         </td>
         <td>
           <input size=20 name="inventory" type="text" placeholder="Поиск...">
@@ -17,95 +17,50 @@
           <p>Наименование</p>
         </td>
         <td>
-          <input size=10 name="serial_number" type="text" placeholder="Поиск...">
-          <br>
-          <p>Серийный номер</p>
-        </td>
-        <td>
           <input size=10 name="model" type="text" placeholder="Поиск...">
           <br>
           <p>Модель</p>
         </td>
         <td>
-          <input size=10 name="manufacturer" type="text" placeholder="Поиск...">
           <br>
-          <p>Производитель</p>
+          <br>
+          <p>Путь к папке с документами</p>
         </td>
         <td>
-          <input size=10 name="documents" type="text" placeholder="Поиск...">
           <br>
-          <p>Документы</p>
-        </td>
-        <td>
-          <input size=10 name="rent" type="text" placeholder="Поиск...">
           <br>
-          <p>Аренда</p>
-        </td>
-        <td>
-          <input size=10 name="attestation" type="text" placeholder="Поиск...">
-          <br>
-          <p>Аттестация</p>
-        </td>
-        <td>
-          <input size=10 name="calibration" type="text" placeholder="Поиск...">
-          <br>
-          <p>Калибровка</p>
+          <p>Руководство по эксплуатации</p>
         </td>
         <td>
           <input size=10 name="movement" type="text" placeholder="Поиск...">
           <br>
           <p>Место нахождения</p>
+          Отсутствует адрес <input type="checkbox" name="without_address" />
+          <br>
         </td>
       </tr>
     </thead>
   </form>
-  {% for char in page_obj %}
-    <tr>
-      <td>
-        <a href="{% url 'web:equipment_edit' char.id %}">{{ char.id }}</a>
-      </td>
-      <td>
-        {{ char.inventory }}
-      </td>
-      <td>
-        {{ char.name }}
-      </td>
-      <td>
-        {{ char.serial_number }}
-      </td>
-      <td>
-        {{ char.model }}
-      </td>
-      <td>
-        {{ char.manufacturer }}
-      </td>
-      <td>
-        {% for doc in char.documents.all %}
-          {{ doc.name }}<br>
-        {% endfor %}
-        {{ char.document_path }}
-      </td>
-      <td>
-        {% with values=char.rents table_object="rent" %}
-          {% include 'includes/accordeon.html' %}
-        {% endwith %}
-      </td>
-      <td>
-        {% with values=char.attestations table_object="attestation" %}
-        {% include 'includes/accordeon.html' %}
-        {% endwith %}
-      </td>
-      <td>
-        {% with values=char.calibrations table_object="calibration" %}
-          {% include 'includes/accordeon.html' %}
-        {% endwith %}
-      </td>
-      <td>
-        {% with values=char.movements table_object="movement" %}
-          {% include 'includes/accordeon.html' %}
-        {% endwith %}
-      </td>
-    </tr>
-  {% endfor %}
+  <form action="{% url 'web:movement_create' '1' %}" method="get">
+    <input size=5 type="submit" value="Передать выбранное оборудование" />
+    {% for char in page_obj %}
+      <tr>
+        <td>
+          <a href="{% url 'web:equipment_edit' char.id %}">изменить {{ char.id }}</a>
+          <input type="checkbox" name="ids" value="{{ char.id }}" />
+        </td>
+        <td>{{ char.inventory }}</td>
+        <td>{{ char.name }}</td>
+        <td>{{ char.model }}</td>
+        <td>{{ char.document_path }}</td>
+        <td><a href="/manual_download/{{ char.id }}/">{{ char.manual }}</a></td>
+        <td>
+          {% with values=char.movements table_object="movement" %}
+            {% include 'includes/accordeon.html' %}
+          {% endwith %}
+        </td>
+      </tr>
+    {% endfor %}
+  </form>
 </table>
 {% include 'includes/paginator.html' %}
