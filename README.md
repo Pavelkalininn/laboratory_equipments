@@ -40,6 +40,12 @@ The DOCKER_USERNAME variable must be present in the Github secrets environment t
     docker-compose -f docker-compose_prod.yml exec web python manage.py createsuperuser
     docker-compose -f docker-compose_prod.yml exec web python manage.py collectstatic --no-input
 
+    docker-compose -f docker-compose_develop.yml up -d --build
+    docker-compose -f docker-compose_develop.yml exec web python manage.py migrate
+    docker-compose -f docker-compose_develop.yml exec web python manage.py loaddata test_fixtures.json
+    docker-compose -f docker-compose_develop.yml exec web python manage.py createsuperuser
+    docker-compose -f docker-compose_develop.yml exec web python manage.py collectstatic --no-input
+
 You need change docker-compose_prod.yml on docker-compose_develop.yml for running application in development mode with open ports and additional abilities
 
 You need to register on the main page, and then confirm the user's status as staff in the admin panel to work in the web application

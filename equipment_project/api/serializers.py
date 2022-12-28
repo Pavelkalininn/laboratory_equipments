@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth import (
     get_user_model,
 )
@@ -6,56 +8,22 @@ from djoser.serializers import (
     UserSerializer,
 )
 from equipments.models import (
-    Attestation,
-    Calibration,
     Destination,
-    Document,
     Equipment,
     Movement,
-    Organization,
-    Rent,
 )
 from rest_framework import (
     serializers,
 )
+from rest_framework.relations import (
+    StringRelatedField,
+)
+
+from equipment_project.settings import (
+    TODAY,
+)
 
 User = get_user_model()
-
-
-class DocumentSerializer(serializers.ModelSerializer):
-    creator = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
-    )
-
-    class Meta:
-        fields = '__all__'
-        model = Document
-
-
-class OrganizationSerializer(serializers.ModelSerializer):
-    creator = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
-    )
-
-    class Meta:
-        fields = '__all__'
-        model = Organization
-
-
-class CalibrationSerializer(serializers.ModelSerializer):
-    creator = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
-    )
-
-    class Meta:
-        fields = '__all__'
-        model = Calibration
 
 
 class DestinationSerializer(serializers.ModelSerializer):
@@ -84,67 +52,27 @@ class MovementSerializer(serializers.ModelSerializer):
 
 
 class MovementCreateSerializer(serializers.ModelSerializer):
-    destination = serializers.PrimaryKeyRelatedField(
-        queryset=Destination.objects.all()
-    )
+    destination = StringRelatedField()
     creator = serializers.SlugRelatedField(
         read_only=True,
-        slug_field='username',
+        slug_field='first_name',
         default=serializers.CurrentUserDefault()
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('destination', 'date', 'equipment', 'creator')
         model = Movement
 
-
-class RentSerializer(serializers.ModelSerializer):
-    creator = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
-    )
-
-    class Meta:
-        fields = '__all__'
-        model = Rent
-
-
-class AttestationSerializer(serializers.ModelSerializer):
-    creator = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
-    )
-
-    class Meta:
-        fields = '__all__'
-        model = Attestation
+    def validate_date(self, value):
+        if value in (TODAY, ):
+            return datetime.date.today()
+        return value
 
 
 class EquipmentCreateSerializer(serializers.ModelSerializer):
-    rents = serializers.PrimaryKeyRelatedField(
-        queryset=Rent.objects.all(),
-        many=True,
-        required=False
-    )
-    attestations = serializers.PrimaryKeyRelatedField(
-        queryset=Attestation.objects.all(),
-        many=True,
-        required=False
-    )
-    calibrations = serializers.PrimaryKeyRelatedField(
-        queryset=Calibration.objects.all(),
-        many=True,
-        required=False
-    )
+
     movements = serializers.PrimaryKeyRelatedField(
         queryset=Destination.objects.all(),
-        many=True,
-        required=False
-    )
-    documents = serializers.PrimaryKeyRelatedField(
-        queryset=Document.objects.all(),
         many=True,
         required=False
     )
@@ -157,19 +85,20 @@ class EquipmentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             'id',
-            'inventory', 'name', 'serial_number', 'model', 'manufacturer',
-            'nomenclature_key', 'documents', 'document_path',
-            'rents', 'attestations', 'calibrations', 'movements', 'creator'
+            'inventory',
+            'name',
+            'model',
+            'nomenclature_key',
+            'manual',
+            'document_path',
+            'movements',
+            'creator'
         )
         model = Equipment
 
 
 class EquipmentSerializer(EquipmentCreateSerializer):
-    rents = serializers.StringRelatedField(many=True)
-    attestations = serializers.StringRelatedField(many=True)
-    calibrations = serializers.StringRelatedField(many=True)
     movements = serializers.StringRelatedField(many=True)
-    documents = serializers.StringRelatedField(many=True)
 
 
 class DjoserUserUpdateSerializer(UserSerializer):

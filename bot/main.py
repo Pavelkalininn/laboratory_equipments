@@ -16,6 +16,7 @@ from exceptions import (
 )
 from telebot import (
     ExceptionHandler,
+    apihelper,
 )
 from telebot.async_telebot import (
     AsyncTeleBot,
@@ -39,7 +40,7 @@ def check_tokens():
     return TELEGRAM_TOKEN and WEB_HOST and ADMIN_ID
 
 
-def main():
+def main(bot_token: str = None, bot_url: str = None):
     """Bot`s main logic."""
     logging.basicConfig(
         level=logging.INFO,
@@ -50,6 +51,8 @@ def main():
         )
     )
     logging.info('Запуск бота')
+    if bot_url:
+        apihelper.API_URL = bot_url
 
     if not check_tokens():
         logging.critical('Отсутствуют переменные окружения.')
@@ -59,7 +62,7 @@ def main():
         )
 
     bot = AsyncTeleBot(
-        TELEGRAM_TOKEN,
+        bot_token or TELEGRAM_TOKEN,
         exception_handler=(
             DebugExceptionHandler()
             if WEB_HOST == 'localhost'
@@ -83,7 +86,7 @@ def main():
     async def input_text(message: Message):
         await text_manager(message)
 
-    asyncio.run(
+    return asyncio.run(
         bot.polling(none_stop=True, timeout=60, request_timeout=600)
     )
 

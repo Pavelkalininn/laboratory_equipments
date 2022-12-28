@@ -13,7 +13,7 @@ services:
     image: redis:alpine
 
   web:
-    image: ${DOCKER_USERNAME}/equipment_project:v1.52
+    image: ${DOCKER_USERNAME}/equipment_project:v1.53
     restart: always
     volumes:
       - static_value:/app/static/
@@ -36,7 +36,7 @@ services:
       - web
 
   bot:
-    image: ${DOCKER_USERNAME}/equipment_project_bot:v1.13
+    image: ${DOCKER_USERNAME}/equipment_project_bot:v1.14
     env_file:
       - ./.env
     depends_on:

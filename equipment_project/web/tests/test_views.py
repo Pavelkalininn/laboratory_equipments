@@ -12,45 +12,24 @@ from django.urls import (
     reverse,
 )
 from equipments.models import (
-    Attestation,
-    Calibration,
     Destination,
-    Document,
     Equipment,
     Movement,
-    Organization,
-    Rent,
 )
 from web.tests.const import (
-    ATTESTATION_NAME_FIRST,
-    ATTESTATION_NAME_SECOND,
-    CALIBRATION_NAME_FIRST,
-    CALIBRATION_NAME_SECOND,
     DATE_AUGUST,
-    DATE_FEBRUARY,
-    DATE_JANUARY,
-    DATE_JUNE,
-    DATE_MARCH,
     DATE_MAY,
     DESTINATION_ADDRESS_FIRST,
     DESTINATION_ADDRESS_SECOND,
-    DOCUMENT_DESCRIPTION_NAME,
-    DOCUMENT_MANUAL_NAME,
     DOCUMENT_PATH_FIRST,
     EQUIPMENT_MODEL_FIRST,
     EQUIPMENT_NAME_FIRST,
-    EQUIPMENT_SERIAL_NUMBER_FIRST,
-    FIRST_ORGANIZATION_NAME,
     INVENTORY_NUM_FIRST,
-    MANUFACTURER_FIRST,
     MASS_EQUIPMENT_DOCUMENT_PATH,
-    MASS_EQUIPMENT_MANUFACTURER,
     MASS_EQUIPMENT_MODEL,
     MASS_EQUIPMENT_NAME,
     MASS_EQUIPMENT_NOMENCLATURE_KEY,
-    MASS_EQUIPMENT_SERIAL_NUMBER,
     NOMENCLATURE_KEY_FIRST,
-    SECOND_ORGANIZATION_NAME,
     USER_NAME_STAFF,
 )
 from web.utils import (
@@ -68,18 +47,6 @@ class EquipmentPagesTests(TestCase):
             username=USER_NAME_STAFF,
             is_staff=True
         )
-        cls.document_manual = Document.objects.create(
-            name=DOCUMENT_MANUAL_NAME
-        )
-        cls.document_description = Document.objects.create(
-            name=DOCUMENT_DESCRIPTION_NAME
-        )
-        cls.organization_first = Organization.objects.create(
-            name=FIRST_ORGANIZATION_NAME
-        )
-        cls.organization_second = Organization.objects.create(
-            name=SECOND_ORGANIZATION_NAME
-        )
         cls.destination_first = Destination.objects.create(
             address=DESTINATION_ADDRESS_FIRST
         )
@@ -90,9 +57,7 @@ class EquipmentPagesTests(TestCase):
             Equipment(
                 inventory=count,
                 name=MASS_EQUIPMENT_NAME + str(count),
-                serial_number=MASS_EQUIPMENT_SERIAL_NUMBER,
                 model=MASS_EQUIPMENT_MODEL,
-                manufacturer=MASS_EQUIPMENT_MANUFACTURER,
                 nomenclature_key=MASS_EQUIPMENT_NOMENCLATURE_KEY,
                 document_path=MASS_EQUIPMENT_DOCUMENT_PATH,
                 creator=EquipmentPagesTests.staff_user
@@ -103,15 +68,10 @@ class EquipmentPagesTests(TestCase):
         cls.equipment = Equipment.objects.create(
             inventory=INVENTORY_NUM_FIRST,
             name=EQUIPMENT_NAME_FIRST,
-            serial_number=EQUIPMENT_SERIAL_NUMBER_FIRST,
             model=EQUIPMENT_MODEL_FIRST,
-            manufacturer=MANUFACTURER_FIRST,
             nomenclature_key=NOMENCLATURE_KEY_FIRST,
             document_path=DOCUMENT_PATH_FIRST,
             creator=EquipmentPagesTests.staff_user
-        )
-        EquipmentPagesTests.equipment.documents.set(
-            (EquipmentPagesTests.document_manual,)
         )
         cls.pages = (
             '/',
@@ -123,49 +83,6 @@ class EquipmentPagesTests(TestCase):
             f'/calibration_create/{EquipmentPagesTests.equipment.id}/',
             f'/movement_create/{EquipmentPagesTests.equipment.id}/',
         )
-        cls.rent_first = Rent.objects.create(
-            owner=EquipmentPagesTests.organization_first,
-            renter=EquipmentPagesTests.organization_second,
-            date=DATE_JANUARY,
-            equipment=EquipmentPagesTests.equipment,
-            creator=EquipmentPagesTests.staff_user
-        )
-        cls.rent_second = Rent.objects.create(
-            owner=EquipmentPagesTests.organization_first,
-            renter=EquipmentPagesTests.organization_second,
-            date=DATE_FEBRUARY,
-            equipment=EquipmentPagesTests.equipment,
-            creator=EquipmentPagesTests.staff_user
-        )
-        cls.attestation_first = Attestation.objects.create(
-            name=ATTESTATION_NAME_FIRST,
-            date=DATE_JANUARY,
-            validity_period=DATE_MARCH,
-            equipment=EquipmentPagesTests.equipment,
-            creator=EquipmentPagesTests.staff_user
-        )
-        cls.attestation_second = Attestation.objects.create(
-            name=ATTESTATION_NAME_SECOND,
-            date=DATE_MARCH,
-            validity_period=DATE_MAY,
-            equipment=EquipmentPagesTests.equipment,
-            creator=EquipmentPagesTests.staff_user
-        )
-        cls.calibration_first = Calibration.objects.create(
-            name=CALIBRATION_NAME_FIRST,
-            date=DATE_JANUARY,
-            validity_period=DATE_MARCH,
-            equipment=EquipmentPagesTests.equipment,
-            creator=EquipmentPagesTests.staff_user
-        )
-        cls.calibration_second = Calibration.objects.create(
-            name=CALIBRATION_NAME_SECOND,
-            date=DATE_MAY,
-            validity_period=DATE_JUNE,
-            equipment=EquipmentPagesTests.equipment,
-            creator=EquipmentPagesTests.staff_user
-        )
-
         cls.movement_first = Movement.objects.create(
             date=DATE_MAY,
             destination=EquipmentPagesTests.destination_first,
@@ -183,18 +100,12 @@ class EquipmentPagesTests(TestCase):
         self.authorized_staff_user = Client()
         self.authorized_staff_user.force_login(self.staff_user)
         self.equipment_count = Equipment.objects.count()
-        self.rent_count = Rent.objects.count()
-        self.attestation_count = Attestation.objects.count()
-        self.calibration_count = Calibration.objects.count()
         self.movement_count = Movement.objects.count()
 
     def test_pre_filled_data_count(self):
         """Проверяем количество созданных объектов"""
         counter = {
             self.equipment_count: 101,
-            self.rent_count: 2,
-            self.attestation_count: 2,
-            self.calibration_count: 2,
             self.movement_count: 2
         }
         for fact_count, expected_count in counter.items():
@@ -206,10 +117,6 @@ class EquipmentPagesTests(TestCase):
         page_dict = {
             reverse('web:index'): 'equipments/index.html',
             reverse(
-                'web:rent_create',
-                kwargs={'equipment_id': EquipmentPagesTests.equipment.id}
-            ): 'equipments/create_form.html',
-            reverse(
                 'web:equipment_get',
                 kwargs={'equipment_id': EquipmentPagesTests.equipment.id}
             ): 'equipments/index.html',
@@ -218,14 +125,6 @@ class EquipmentPagesTests(TestCase):
             ): 'equipments/create_form.html',
             reverse(
                 'web:equipment_edit',
-                kwargs={'equipment_id': EquipmentPagesTests.equipment.id}
-            ): 'equipments/create_form.html',
-            reverse(
-                'web:attestation_create',
-                kwargs={'equipment_id': EquipmentPagesTests.equipment.id}
-            ): 'equipments/create_form.html',
-            reverse(
-                'web:calibration_create',
                 kwargs={'equipment_id': EquipmentPagesTests.equipment.id}
             ): 'equipments/create_form.html',
             reverse(
@@ -320,11 +219,8 @@ class EquipmentPagesTests(TestCase):
         fields_dict = {
             'inventory': forms.fields.CharField,
             'name': forms.fields.CharField,
-            'serial_number': forms.fields.CharField,
             'model': forms.fields.CharField,
-            'manufacturer': forms.fields.CharField,
             'nomenclature_key': forms.fields.IntegerField,
-            'documents': forms.models.ModelMultipleChoiceField,
             'document_path': forms.fields.CharField,
         }
         for field, class_name in fields_dict.items():

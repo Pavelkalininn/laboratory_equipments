@@ -1,9 +1,7 @@
 from api.views import (
-    AttestationViewSet,
-    CalibrationViewSet,
+    DestinationViewSet,
     EquipmentViewSet,
     MovementViewSet,
-    RentViewSet,
     UserViewSet,
 )
 from django.urls import (
@@ -22,24 +20,15 @@ router.register(
     basename='equipment-list'
 )
 router.register(
-    'calibrations',
-    CalibrationViewSet,
-    basename='calibration-list'
-)
-router.register(
     'movements',
     MovementViewSet,
     basename='movement-list'
 )
+
 router.register(
-    'attestations',
-    AttestationViewSet,
-    basename='attestation-list'
-)
-router.register(
-    'rents',
-    RentViewSet,
-    basename='rent-list'
+    'destinations',
+    DestinationViewSet,
+    basename='destination-list'
 )
 
 router.register(
