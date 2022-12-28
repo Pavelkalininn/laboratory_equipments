@@ -62,7 +62,7 @@ jobs:
         with:
           push: true
           context: equipment_project/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.54
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.55
 
       - name: Push bot to Docker Hub
         uses: docker/build-push-action@v2
