@@ -1,5 +1,5 @@
 {% if value.recipient %}
-  {{ value.recipient.last_name }}<br>
+  Получил: {{ value.recipient.first_name }} {{ value.recipient.last_name }}<br>
 {% endif %}
 {% if value.early %}
   Дата раньше фактической<br>
@@ -8,7 +8,7 @@
   Дата позже фактической<br>
 {% endif %}
 {% if value.destination.address %}
-  {{ value.destination.address }}<br>
+  Место нахождения: {{ value.destination.address }}<br>
 {% endif %}
 {% if value.owner %}
   Владелец: {{ value.owner }}<br>
@@ -17,6 +17,6 @@
   Дата: {{ value.date }}<br>
 {% endif %}
 {% if value.creator %}
-  {{ value.creator.last_name }}
+  Передал: {{ value.creator.first_name }} {{ value.creator.last_name }}
 {% endif %}
 
