@@ -22,6 +22,8 @@ from web.tests.const import (
     DESTINATION_ADDRESS_FIRST,
     DESTINATION_ADDRESS_SECOND,
     DOCUMENT_PATH_FIRST,
+    EMAIL_NON_STAFF,
+    EMAIL_STAFF,
     EQUIPMENT_MODEL_FIRST,
     EQUIPMENT_NAME_FIRST,
     INVENTORY_NUM_FIRST,
@@ -30,6 +32,7 @@ from web.tests.const import (
     MASS_EQUIPMENT_NAME,
     MASS_EQUIPMENT_NOMENCLATURE_KEY,
     NOMENCLATURE_KEY_FIRST,
+    USER_NAME_NON_STAFF,
     USER_NAME_STAFF,
 )
 from web.utils import (
@@ -45,7 +48,13 @@ class EquipmentPagesTests(TestCase):
         super().setUpClass()
         cls.staff_user = User.objects.create_user(
             username=USER_NAME_STAFF,
+            email=EMAIL_STAFF,
             is_staff=True
+        )
+        cls.non_staff_user = User.objects.create_user(
+            username=USER_NAME_NON_STAFF,
+            email=EMAIL_NON_STAFF,
+            is_staff=False
         )
         cls.destination_first = Destination.objects.create(
             address=DESTINATION_ADDRESS_FIRST
@@ -82,12 +91,18 @@ class EquipmentPagesTests(TestCase):
         )
         cls.movement_first = Movement.objects.create(
             date=DATE_MAY,
+            early=False,
+            late=False,
+            recipient=EquipmentPagesTests.non_staff_user,
             destination=EquipmentPagesTests.destination_first,
             equipment=EquipmentPagesTests.equipment,
             creator=EquipmentPagesTests.staff_user
         )
         cls.movement_second = Movement.objects.create(
             date=DATE_AUGUST,
+            early=False,
+            late=False,
+            recipient=EquipmentPagesTests.non_staff_user,
             destination=EquipmentPagesTests.destination_second,
             equipment=EquipmentPagesTests.equipment,
             creator=EquipmentPagesTests.staff_user
@@ -235,19 +250,3 @@ class EquipmentPagesTests(TestCase):
             ).context.get('form').instance
         )
         self.assertEqual(response, EquipmentPagesTests.equipment)
-
-    def test_comment_post_page(self):
-        """Страница equipment_get отображает внесенные связанные данные по
-         оборудованию (rents, attestations, calibrations)."""
-        response = (
-            self.authorized_staff_user.get(
-                reverse(
-                    'web:equipment_get',
-                    kwargs={'equipment_id': EquipmentPagesTests.equipment.id}
-                )
-            )
-        )
-        self.assertEqual(
-            len(response.context.get('page_obj')),
-            1,
-        )

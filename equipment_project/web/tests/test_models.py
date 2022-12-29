@@ -14,10 +14,12 @@ from web.tests.const import (
     DESTINATION_ADDRESS_FIRST,
     DESTINATION_ADDRESS_SECOND,
     DOCUMENT_PATH_FIRST,
+    EMAIL_NON_STAFF,
     EQUIPMENT_MODEL_FIRST,
     EQUIPMENT_NAME_FIRST,
     INVENTORY_NUM_FIRST,
     NOMENCLATURE_KEY_FIRST,
+    USER_NAME_NON_STAFF,
     USER_NAME_STAFF,
 )
 
@@ -31,6 +33,11 @@ class EquipmentModelTest(TestCase):
         cls.staff_user = User.objects.create_user(
             username=USER_NAME_STAFF,
             is_staff=True
+        )
+        cls.non_staff_user = User.objects.create_user(
+            username=USER_NAME_NON_STAFF,
+            email=EMAIL_NON_STAFF,
+            is_staff=False
         )
         cls.destination_first = Destination.objects.create(
             address=DESTINATION_ADDRESS_FIRST
@@ -50,6 +57,9 @@ class EquipmentModelTest(TestCase):
         )
         self.movement = Movement.objects.create(
             date=DATE_MAY,
+            early=False,
+            late=False,
+            recipient=EquipmentModelTest.non_staff_user,
             destination=self.destination_first,
             equipment=self.equipment,
             creator=self.staff_user
