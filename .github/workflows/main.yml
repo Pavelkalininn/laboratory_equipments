@@ -101,7 +101,7 @@ jobs:
             echo EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}' >> .env
             echo DEFAULT_FROM_EMAIL='${{ secrets.DEFAULT_FROM_EMAIL }}' >> .env
             echo WEB_URL='${{ secrets.WEB_URL }}' >> .env
-            docker-compose pull  && docker-compose up -d
+            sudo docker-compose pull  && sudo docker-compose up -d
 
   send_message:
     runs-on: ubuntu-latest
