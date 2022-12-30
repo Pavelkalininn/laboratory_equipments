@@ -69,10 +69,10 @@ def my_equipments(request):
     equipments = table_filters(
         request,
         Equipment.objects.annotate(
-            date=Max('movements__date')
+            last_movement_id=Max('movements__pk')
         ).filter(
             movements__recipient=request.user,
-            movements__date=F('date')
+            movements__pk=F('last_movement_id')
         ).distinct().all()
     )
     page_obj = pagination(equipments, request)
