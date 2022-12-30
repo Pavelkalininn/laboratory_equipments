@@ -62,14 +62,14 @@ jobs:
         with:
           push: true
           context: equipment_project/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:v1.56
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project:latest
 
       - name: Push bot to Docker Hub
         uses: docker/build-push-action@v2
         with:
           push: true
           context: bot/
-          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:v1.14
+          tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -84,8 +84,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            sudo docker-compose stop
-            sudo docker-compose rm web
+            rm .env
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
@@ -101,7 +100,8 @@ jobs:
             echo EMAIL_HOST_USER='${{ secrets.EMAIL_HOST_USER }}' >> .env
             echo EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}' >> .env
             echo DEFAULT_FROM_EMAIL='${{ secrets.DEFAULT_FROM_EMAIL }}' >> .env
-            sudo docker-compose up -d
+            echo WEB_URL='${{ secrets.WEB_URL }}' >> .env
+            docker-compose pull  && docker-compose up -d
 
   send_message:
     runs-on: ubuntu-latest

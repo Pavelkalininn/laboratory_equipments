@@ -1,4 +1,4 @@
 {% if not value.destination.address %}
-  <font color="red">Адрес не указан</font>
+  <font color="red">Адрес не указан</font><br>
   <a href="{% url 'web:movement_update' value.id %}">Передать адрес использования</a><br>
 {% endif %}

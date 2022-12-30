@@ -13,7 +13,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', default='tokentokentokentokentokentokentokentokentokent')
 
 DEBUG = os.getenv('DEBUG', default='')
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'https://127.0.0.1',
+    'https://localhost',
+    'https://testsvyaz.ddns.net/'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -55,7 +59,11 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", default='password')
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", default='admin@ya.ru')
 
 ROOT_URLCONF = 'equipment_project.urls'
-CSRF_TRUSTED_ORIGINS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://127.0.0.1',
+    'https://localhost',
+    os.getenv('WEB_URL', default='localhost')
+]
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 TEMPLATES = [
     {

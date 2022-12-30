@@ -13,7 +13,7 @@ services:
     image: redis:alpine
 
   web:
-    image: ${DOCKER_USERNAME}/equipment_project:v1.56
+    image: ${DOCKER_USERNAME}/equipment_project
     restart: always
     volumes:
       - static_value:/app/static/
@@ -47,7 +47,7 @@ services:
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   bot:
-    image: ${DOCKER_USERNAME}/equipment_project_bot:v1.14
+    image: ${DOCKER_USERNAME}/equipment_project_bot
     env_file:
       - ./.env
     depends_on:
