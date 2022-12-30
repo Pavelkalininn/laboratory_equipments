@@ -71,41 +71,41 @@ jobs:
           context: bot/
           tags: ${{ secrets.DOCKER_USERNAME }}/equipment_project_bot:v1.14
 
-#  deploy:
-#    runs-on: ubuntu-latest
-#    needs: build_and_push_to_docker_hub
-#    if: github.ref == 'refs/heads/main'
-#    steps:
-#      - name: executing remote ssh commands to deploy
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.HOST }}
-#          username: ${{ secrets.USER }}
-#          key: ${{ secrets.SSH_KEY }}
-#          passphrase: ${{ secrets.PASSPHRASE }}
-#          script: |
-#            sudo docker-compose stop
-#            sudo docker-compose rm web
-#            touch .env
-#            echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
-#            echo DB_NAME=${{ secrets.DB_NAME }} >> .env
-#            echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
-#            echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
-#            echo DB_HOST=${{ secrets.DB_HOST }} >> .env
-#            echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-#            echo SECRET_KEY='${{ secrets.SECRET_KEY }}' >> .env
-#            echo DOCKER_USERNAME='${{ secrets.DOCKER_USERNAME }}' >> .env
-#            echo EMAIL_USE_TLS='${{ secrets.EMAIL_USE_TLS }}' >> .env
-#            echo EMAIL_HOST='${{ secrets.EMAIL_HOST }}' >> .env
-#            echo EMAIL_PORT='${{ secrets.EMAIL_PORT }}' >> .env
-#            echo EMAIL_HOST_USER='${{ secrets.EMAIL_HOST_USER }}' >> .env
-#            echo EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}' >> .env
-#            echo DEFAULT_FROM_EMAIL='${{ secrets.DEFAULT_FROM_EMAIL }}' >> .env
-#            sudo docker-compose up -d
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push_to_docker_hub
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script: |
+            sudo docker-compose stop
+            sudo docker-compose rm web
+            touch .env
+            echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
+            echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+            echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
+            echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+            echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+            echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+            echo SECRET_KEY='${{ secrets.SECRET_KEY }}' >> .env
+            echo DOCKER_USERNAME='${{ secrets.DOCKER_USERNAME }}' >> .env
+            echo EMAIL_USE_TLS='${{ secrets.EMAIL_USE_TLS }}' >> .env
+            echo EMAIL_HOST='${{ secrets.EMAIL_HOST }}' >> .env
+            echo EMAIL_PORT='${{ secrets.EMAIL_PORT }}' >> .env
+            echo EMAIL_HOST_USER='${{ secrets.EMAIL_HOST_USER }}' >> .env
+            echo EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}' >> .env
+            echo DEFAULT_FROM_EMAIL='${{ secrets.DEFAULT_FROM_EMAIL }}' >> .env
+            sudo docker-compose up -d
+
   send_message:
     runs-on: ubuntu-latest
-#    needs: deploy
-    needs: build_and_push_to_docker_hub
+    needs: deploy
     steps:
       - name: send message
         uses: appleboy/telegram-action@master
