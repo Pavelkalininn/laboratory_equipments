@@ -12,11 +12,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='tokentokentokentokentokentokentokentokentokent')
 
-DEBUG = os.getenv('DEBUG', default='')
+DEBUG = True or os.getenv('DEBUG', default='')
 ALLOWED_HOSTS = [
-    'https://127.0.0.1',
-    'https://localhost',
-    'https://testsvyaz.ddns.net/'
+    '127.0.0.1',
+    'localhost',
+    os.getenv('WEB_URL', default='localhost')
 ]
 
 INSTALLED_APPS = [
@@ -60,8 +60,8 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", default='admin@ya.ru')
 
 ROOT_URLCONF = 'equipment_project.urls'
 CSRF_TRUSTED_ORIGINS = [
-    'https://127.0.0.1',
-    'https://localhost',
+    '127.0.0.1',
+    'localhost',
     os.getenv('WEB_URL', default='localhost')
 ]
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
@@ -85,22 +85,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'equipment_project.wsgi.application'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': os.getenv('DB_NAME', default='postgres'),
-        'USER': os.getenv('POSTGRES_USER', default='postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
-        'HOST': os.getenv('DB_HOST', default='localhost'),
-        'PORT': os.getenv('DB_PORT', default='5432'),
-    }
-}
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#         'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+#         'NAME': os.getenv('DB_NAME', default='postgres'),
+#         'USER': os.getenv('POSTGRES_USER', default='postgres'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+#         'HOST': os.getenv('DB_HOST', default='localhost'),
+#         'PORT': os.getenv('DB_PORT', default='5432'),
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
